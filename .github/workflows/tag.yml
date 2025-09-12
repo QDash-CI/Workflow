@@ -1,0 +1,71 @@
+name: Create Tag Release
+
+on:
+  repository_dispatch:
+    types: [tag]
+
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yml
+    with:
+      build-type: 'Release'
+      devel: false
+      build-id: 'tag'
+
+  release:
+    name: "Create Release"
+    needs: [build]
+    permissions:
+      actions: read
+      security-events: write
+      contents: write
+      discussions: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Parse Forgejo payload
+        shell: bash
+        run: |
+          export PAYLOAD_JSON='${{ toJSON(github.event.client_payload) }}'
+          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
+          ./.ci/parse.sh tag
+
+      # TODO(crueter): Host on my Git
+      - name: Set environment variables
+        run: |
+          echo "REPO=QDash-CI/Releases" >> $GITHUB_ENV
+          echo "DEVEL=false" >> $GITHUB_ENV
+
+      - name: Package artifacts nicely
+        run: |
+          export ID=${FORGEJO_REF}
+          ./pack.sh
+
+      - name: Generate changelog
+        run: |
+          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
+          ./.ci/changelog/tag.sh > changelog.md
+
+      - name: Release
+        uses: softprops/action-gh-release@v2.2.2
+        with:
+          name: "QDash ${{ env.FORGEJO_REF }}"
+          tag_name: ${{ env.FORGEJO_REF }}
+          repository: ${{ env.REPO }}
+          body_path: ./changelog.md
+          prerelease: false
+          draft: true
+          generate_release_notes: false
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          fail_on_unmatched_files: false
+          make_latest: true
+          files: |
+            artifacts/*
