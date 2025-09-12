@@ -270,6 +270,17 @@ jobs:
           brew install llvm
           pip install jinja2
 
+      - name: Parse Forgejo payload
+        shell: bash
+        run: |
+          export PAYLOAD_JSON='${{ toJSON(github.event.client_payload) }}'
+          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
+          ./.ci/parse.sh ${{ inputs.build-id }}
+
+      - name: Clone
+        shell: bash
+        run: ./.ci/clone.sh true
+
       - name: Configure & Build
         run: |
           export USE_CCACHE=true
