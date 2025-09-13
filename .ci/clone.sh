@@ -18,3 +18,4 @@ done
 cd QDash
 git fetch --all --tags
 git checkout $FORGEJO_REF
+git describe --tags
