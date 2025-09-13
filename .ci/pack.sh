@@ -6,9 +6,9 @@ ARCHES="amd64 aarch64"
 
 for arch in $ARCHES
 do
-  cp linux-appimage-$arch/*.AppImage "artifacts/QDash-${ID}-${arch}.AppImage"
+  cp linux-appimage-$arch/*.AppImage "artifacts/QDash-Linux-${ID}-${arch}.AppImage"
   if [ "$DEVEL" = "false" ]; then
-    cp linux-appimage-$arch/*.AppImage.zsync "artifacts/QDash-${ID}-${arch}.AppImage.zsync"
+    cp linux-appimage-$arch/*.AppImage.zsync "artifacts/QDash-Linux-${ID}-${arch}.AppImage.zsync"
   fi
 done
 
