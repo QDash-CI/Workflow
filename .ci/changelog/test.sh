@@ -9,4 +9,4 @@ brief() {
 
 changelog() {}
 
-.ci/generate.sh
+.ci/changelog/generate.sh
