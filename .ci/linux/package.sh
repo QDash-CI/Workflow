@@ -44,7 +44,7 @@ then
 	BUILDDIR=build
 fi
 
-QDash_TAG=$(git describe --tags --abbrev=0)
+QDash_TAG=$(cat GIT-TAG)
 echo "Making \"$QDash_TAG\" build"
 VERSION="$QDash_TAG"
 
