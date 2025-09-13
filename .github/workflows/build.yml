@@ -21,6 +21,7 @@ on:
 env:
   qt_version: 6.9.1
   qt_modules: qtmultimedia
+  SCCACHE_GHA_ENABLED: "true"
 
 jobs:
   summary:
@@ -106,8 +107,8 @@ jobs:
           chmod +x ./.ci/linux/get-dependencies.sh
           ./.ci/linux/get-dependencies.sh
 
-      - name: Setup CCache
-        uses: hendrikmuhs/ccache-action@v1.2
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@v0.0.9
         with:
           key: ${{ runner.os }}-${{ matrix.arch }}-${{ inputs.build_type }}
 
