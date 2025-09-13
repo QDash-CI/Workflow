@@ -9,7 +9,7 @@ linux() {
   DESCRIPTION="$3"
 
   echo -n "| "
-  echo -n "[$PRETTY_ARCH](${BASE_DOWNLOAD_URL}/${FORGEJO_REF}/QDash-${TAG}-${ARCH}.AppImage) | "
+  echo -n "[$PRETTY_ARCH](${BASE_DOWNLOAD_URL}/${TAG}/QDash-Linux-${TAG}-${ARCH}.AppImage) | "
   echo -n "$DESCRIPTION |"
   echo
 }
@@ -20,8 +20,8 @@ win() {
   DESCRIPTION="$3"
 
   echo -n "| "
-  echo -n "[$PRETTY_ARCH (binary)](${BASE_DOWNLOAD_URL}/${FORGEJO_REF}/QDash-Windows-${TAG}-${ARCH}.zip) | "
-  echo -n "[$PRETTY_ARCH (setup)](${BASE_DOWNLOAD_URL}/${FORGEJO_REF}/QDash-Setup-${TAG}-${ARCH}.exe) | "
+  echo -n "[$PRETTY_ARCH (binary)](${BASE_DOWNLOAD_URL}/${TAG}/QDash-Windows-${TAG}-${ARCH}.zip) | "
+  echo -n "[$PRETTY_ARCH (setup)](${BASE_DOWNLOAD_URL}/${TAG}/QDash-Windows-${TAG}-${ARCH}.exe) | "
   echo -n "$DESCRIPTION |"
   echo
 }

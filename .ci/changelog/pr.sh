@@ -9,7 +9,7 @@ linux() {
   DESCRIPTION="$3"
 
   echo -n "| "
-  echo -n "[$PRETTY_ARCH](${BASE_DOWNLOAD_URL}/${FORGEJO_REF}/QDash-${TAG}-${ARCH}.AppImage) | "
+  echo -n "[$PRETTY_ARCH](${BASE_DOWNLOAD_URL}/${FORGEJO_REF}/QDash-Linux-${TAG}-${ARCH}.AppImage) | "
   echo -n "$DESCRIPTION |"
   echo
 }
@@ -60,5 +60,5 @@ echo "### macOS"
 echo
 echo "macOS comes in a universal binary."
 echo
-echo "[macOS Universal Binary](${BASE_DOWNLOAD_URL}/${TAG}/QDash-macOS-${TAG}.tar.gz)"
+echo "[macOS Universal Binary](${BASE_DOWNLOAD_URL}/${FORGEJO_REF}/QDash-macOS-${TAG}.tar.gz)"
 echo

@@ -47,20 +47,28 @@ jobs:
 
       - name: Package artifacts nicely
         run: |
-          export ID=test
+          export ID=continuous
           ./.ci/pack.sh
 
       - name: Generate changelog
         run: |
           export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
-          export ID=test
+          export ID=continuous
           ./.ci/changelog/master.sh > changelog.md
+
+      - name: Delete Previous Release
+        run: |
+          gh release delete "continuous" --repo "$REPO" --cleanup-tag  -y
+          sleep 5
+        env:
+          GH_TOKEN: "${{ secrets.CUSTOM_GITHUB_TOKEN }}"
+        continue-on-error: true
 
       - name: Release
         uses: softprops/action-gh-release@v2.2.2
         with:
-          name: "QDash Test Build - ${{ env.FORGEJO_REF }}"
-          tag_name: ${{ env.FORGEJO_REF }}
+          name: "QDash Continuous Build"
+          tag_name: continuous
           repository: ${{ env.REPO }}
           body_path: ./changelog.md
           prerelease: false
