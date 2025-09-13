@@ -8,8 +8,7 @@ on:
     branches:
       - '*'
   schedule:
-    cron:
-      - '0 21 * * *'
+    - cron: '0 21 * * *'
 
 jobs:
   build:
@@ -45,7 +44,7 @@ jobs:
 
       - name: Set environment variables
         run: |
-          echo "REPO=QDash-CI/Master" >> $GITHUB_ENV
+          echo "REPO=QDash-CI/Test" >> $GITHUB_ENV
           echo "DEVEL=true" >> $GITHUB_ENV
 
       - name: Package artifacts nicely
