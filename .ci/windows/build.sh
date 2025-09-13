@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 if [ "$USE_CCACHE" = "true" ]; then
-    export EXTRA_CMAKE_FLAGS=("${EXTRA_CMAKE_FLAGS[@]}" -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_C_COMPILER_LAUNCHER=sccache)
+    export EXTRA_CMAKE_FLAGS=("${EXTRA_CMAKE_FLAGS[@]}" -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache -DUSE_CCACHE=ON)
 fi
 
 if [ "$WINDEPLOYQT" == "" ]; then
@@ -27,7 +27,7 @@ cmake .. -G Ninja \
 ninja
 
 if [ "$USE_CCACHE" = "true" ]; then
-    sccache --show-stats
+    ccache -s
 fi
 
 set +e
