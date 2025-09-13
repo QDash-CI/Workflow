@@ -73,6 +73,7 @@ jobs:
             QDash/.*
 
   linux:
+    needs: [clone]
     strategy:
       fail-fast: false
       matrix:
@@ -124,6 +125,9 @@ jobs:
 
       - name: Configure & Build
         run: |
+          ls
+          ls QDash
+          cat QDash/*.txt
           export TARGET=appimage
           export BUILD_TYPE=${{ inputs.build_type }}
           export USE_CCACHE=true
@@ -159,6 +163,7 @@ jobs:
           path: QDash/*.AppImage*
 
   windows:
+    needs: [clone]
     name: "Windows (${{ matrix.arch }})"
     runs-on: ${{ matrix.runs-on }}
 
@@ -250,6 +255,7 @@ jobs:
           path: QDash/QDash-Setup.exe
 
   macos:
+    needs: [clone]
     strategy:
       fail-fast: false
       matrix:
