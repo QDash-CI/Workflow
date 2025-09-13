@@ -51,7 +51,6 @@ jobs:
 
       - name: Generate changelog
         run: |
-          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
           ./.ci/changelog/tag.sh > changelog.md
 
       - name: Release
