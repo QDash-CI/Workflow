@@ -21,4 +21,4 @@ git checkout $FORGEJO_REF
 
 git rev-parse --abbrev-ref HEAD > GIT-REFSPEC
 git describe --abbrev=0 --always HEAD > GIT-COMMIT
-git describe --tags HEAD > GIT-TAG || echo '1.0.0' > GIT-TAG
+git describe --tags HEAD --abbrev=0 > GIT-TAG || echo '1.0.0' > GIT-TAG
