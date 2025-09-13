@@ -107,8 +107,8 @@ jobs:
           chmod +x ./.ci/linux/get-dependencies.sh
           ./.ci/linux/get-dependencies.sh
 
-      - name: Setup sccache
-        uses: mozilla-actions/sccache-action@v0.0.9
+      - name: Setup CCache
+        uses: hendrikmuhs/ccache-action@v1.2
         with:
           key: ${{ runner.os }}-${{ matrix.arch }}-${{ inputs.build_type }}
 
