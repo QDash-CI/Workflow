@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2025 crueter
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-QDash_TAG=$(git describe --tags --abbrev=0)
+QDash_TAG=$(cat GIT-TAG)
 echo "Making \"$QDash_TAG\" build"
 VERSION="$QDash_TAG"
 

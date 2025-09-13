@@ -48,7 +48,7 @@ jobs:
       - name: Package artifacts nicely
         run: |
           export ID=test
-          ./pack.sh
+          ./.ci/pack.sh
 
       - name: Generate changelog
         run: |
