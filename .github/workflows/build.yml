@@ -23,7 +23,7 @@ env:
   qt_modules: qtmultimedia
 
 jobs:
-  source:
+  summary:
     name: "Summary"
     runs-on: ubuntu-latest
 
@@ -37,11 +37,40 @@ jobs:
           export PAYLOAD_JSON='${{ toJSON(github.event.client_payload) }}'
           export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
           ./.ci/parse.sh ${{ inputs.build-id }}
-      
+
       - name: Create job summary
         run: |
           export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
           ./.ci/summary.sh ${{ inputs.build-id }}
+
+  clone:
+    name: "Clone"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Parse Forgejo payload
+        shell: bash
+        run: |
+          export PAYLOAD_JSON='${{ toJSON(github.event.client_payload) }}'
+          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
+          ./.ci/parse.sh ${{ inputs.build-id }}
+
+      - name: Clone
+        shell: bash
+        run: ./.ci/clone.sh true
+
+      - name: Upload cloned repo
+        uses: actions/upload-artifact@v4
+        with:
+          name: QDash
+          path: |
+            QDash/*
+            QDash/.*
 
   linux:
     strategy:
@@ -89,8 +118,9 @@ jobs:
           ./.ci/parse.sh ${{ inputs.build-id }}
 
       - name: Clone
-        shell: bash
-        run: ./.ci/clone.sh true
+        uses: actions/download-artifact@v4
+        with:
+          name: QDash
 
       - name: Configure & Build
         run: |
@@ -100,7 +130,7 @@ jobs:
 
           chmod a+x .ci/linux/build.sh
           .ci/linux/build.sh ${{ matrix.pkg_arch }}
-      
+
       - name: Package (AppImage)
         run: |
           export DEVEL=${{ inputs.devel }}
@@ -114,17 +144,15 @@ jobs:
           cmake --install build --prefix install/usr
 
           cd install
-          tar --owner root --group root -czf ../QDash.tar.zst *
+          tar --owner root --group root --zstd -cf ../QDash.tar.zst *
 
       - name: Upload Binary
-        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: linux-binary-${{ matrix.arch }}
           path: QDash/QDash.tar.zst
 
       - name: Upload AppImage
-        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: linux-appimage-${{ matrix.arch }}
@@ -183,8 +211,9 @@ jobs:
           ./.ci/parse.sh ${{ inputs.build-id }}
 
       - name: Clone
-        shell: bash
-        run: ./.ci/clone.sh true
+        uses: actions/download-artifact@v4
+        with:
+          name: QDash
 
       - name: Build
         shell: bash
@@ -215,7 +244,6 @@ jobs:
           path: QDash/artifacts/*
 
       - name: Upload (Installer)
-        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: windows-setup-${{ matrix.arch }}
@@ -252,13 +280,7 @@ jobs:
         with:
           key: ${{ runner.os }}-${{ inputs.build_type }}
 
-      - name: Cache Build Deps
-        uses: actions/cache@v4
-        with:
-          path: build/_deps/*-src
-          key: QDash
-
-      - name: Set up Python 3.8 
+      - name: Set up Python 3.8
         uses: actions/setup-python@v5
         with:
           python-version: 3.8
@@ -278,8 +300,9 @@ jobs:
           ./.ci/parse.sh ${{ inputs.build-id }}
 
       - name: Clone
-        shell: bash
-        run: ./.ci/clone.sh true
+        uses: actions/download-artifact@v4
+        with:
+          name: QDash
 
       - name: Configure & Build
         run: |
