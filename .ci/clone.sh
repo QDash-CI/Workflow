@@ -16,6 +16,9 @@ while ! git clone $FORGEJO_CLONE_URL QDash; do
 done
 
 cd QDash
-git fetch --all --tags
+git fetch --all
 git checkout $FORGEJO_REF
-git describe --tags
+
+git rev-parse --abbrev-ref HEAD > GIT-REFSPEC
+git describe --abbrev=0 --always HEAD > GIT-COMMIT
+git describe --tags HEAD > GIT-TAG || echo '1.0.0' > GIT-TAG
