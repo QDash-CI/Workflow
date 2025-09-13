@@ -16,5 +16,5 @@ while ! git clone $FORGEJO_CLONE_URL QDash; do
 done
 
 cd QDash
-git fetch --all
+git fetch --all --tags
 git checkout $FORGEJO_REF
