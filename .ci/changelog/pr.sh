@@ -13,5 +13,3 @@ changelog() {
   FIELD=body DEFAULT_MSG="No changelog provided" FORGEJO_NUMBER=$FORGEJO_NUMBER python3 .ci/changelog/pr_field.py
   echo
 }
-
-.ci/changelog/generate.sh

@@ -46,6 +46,7 @@ jobs:
         run: |
           echo "REPO=QDash-CI/Test" >> $GITHUB_ENV
           echo "DEVEL=true" >> $GITHUB_ENV
+          echo "BUILD=test" >> $GITHUB_ENV
 
       - name: Package artifacts nicely
         run: |
@@ -53,8 +54,7 @@ jobs:
           ./.ci/pack.sh
 
       - name: Generate changelog
-        run: |
-          ./.ci/changelog/test.sh > changelog.md
+        run: ./.ci/changelog/generate.sh > changelog.md
 
       - name: Delete Previous Release
         run: |

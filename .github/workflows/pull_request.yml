@@ -40,17 +40,18 @@ jobs:
         run: |
           echo "REPO=QDash-CI/PR" >> $GITHUB_ENV
           echo "DEVEL=true" >> $GITHUB_ENV
+          echo "BUILD=pr" >> $GITHUB_ENV
 
       - name: Package artifacts nicely
         run: |
           export ID=${FORGEJO_NUMBER}-${FORGEJO_REF}
           ./.ci/pack.sh
 
-      - name: Generate changelog
-        run: |
-          sudo apt install -y python3-requests
+      - name: Install dependencies
+        run: sudo apt install -y python3-requests
 
-          ./.ci/changelog/pr.sh > changelog.md
+      - name: Generate changelog
+        run: ./.ci/changelog/generate.sh > changelog.md
 
       - name: Delete Previous Release
         run: |

@@ -1,5 +1,6 @@
 #!/bin/sh -ex
 
+. .ci/changelog/$BUILD.sh
 BASE_DOWNLOAD_URL="https://github.com/$REPO/releases/download"
 
 linux() {

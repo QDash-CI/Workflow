@@ -39,6 +39,7 @@ jobs:
           echo "REPO=QDash-CI/Master" >> $GITHUB_ENV
           echo "DEVEL=true" >> $GITHUB_ENV
           echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
+          echo "BUILD=master" >> $GITHUB_ENV
 
       - name: Package artifacts nicely
         run: |
@@ -46,7 +47,7 @@ jobs:
           ./.ci/pack.sh
 
       - name: Generate changelog
-        run: ./.ci/changelog/master.sh > changelog.md
+        run: ./.ci/changelog/generate.sh > changelog.md
 
       - name: Release
         uses: softprops/action-gh-release@v2.2.2

@@ -7,6 +7,6 @@ brief() {
   echo "This is a continuous test build of QDash."
 }
 
-changelog() {}
-
-.ci/changelog/generate.sh
+changelog() {
+  echo
+}

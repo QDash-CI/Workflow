@@ -13,5 +13,3 @@ changelog() {
   echo "Full changelog: [\`$FORGEJO_BEFORE...$FORGEJO_REF\`](https://git.crueter.xyz/QFRC/QDash/compare/$FORGEJO_BEFORE...$FORGEJO_REF)"
   echo
 }
-
-.ci/changelog/generate.sh

@@ -9,5 +9,3 @@ changelog() {
   echo "## Changelog"
   echo
 }
-
-.ci/changelog/generate.sh
