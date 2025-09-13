@@ -3,8 +3,6 @@
 # SPDX-FileCopyrightText: 2025 crueter
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-cd QDash
-
 cd build
 rm -rf QDash.app
 cp -r QDash/Native/QDash.app .

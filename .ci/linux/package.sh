@@ -5,8 +5,6 @@
 
 # This script assumes you're in the source directory
 
-cd QDash
-
 URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
 SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/qml/useful-tools/quick-sharun.sh"
 

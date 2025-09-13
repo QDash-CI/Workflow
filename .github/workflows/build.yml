@@ -125,9 +125,6 @@ jobs:
 
       - name: Configure & Build
         run: |
-          ls
-          ls QDash
-          cat QDash/*.txt
           export TARGET=appimage
           export BUILD_TYPE=${{ inputs.build_type }}
           export USE_CCACHE=true
