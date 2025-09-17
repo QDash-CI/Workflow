@@ -51,7 +51,9 @@ jobs:
         run: sudo apt install -y python3-requests
 
       - name: Generate changelog
-        run: ./.ci/changelog/generate.sh > changelog.md
+        run: |
+          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
+          ./.ci/changelog/generate.sh > changelog.md
 
       - name: Delete Previous Release
         run: |
