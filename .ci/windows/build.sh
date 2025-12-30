@@ -31,7 +31,7 @@ if [ "$USE_CCACHE" = "true" ]; then
 fi
 
 set +e
-rm -f build/*.pdb
+rm -f *.pdb
 set -e
 
 $WINDEPLOYQT --release \
@@ -42,6 +42,6 @@ $WINDEPLOYQT --release \
              --dir pkg \
              --qmldir ../QDash \
              --qmlimport $QML2_IMPORT_PATH \
-             build/bin/QDash.exe
+             bin/QDash.exe
 
-cp build/bin/QDash.exe pkg
+cp bin/QDash.exe pkg
