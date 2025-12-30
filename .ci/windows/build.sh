@@ -42,6 +42,6 @@ $WINDEPLOYQT --release \
              --dir pkg \
              --qmldir ../QDash \
              --qmlimport $QML2_IMPORT_PATH \
-             QDash.exe
+             build/bin/QDash.exe
 
-cp QDash.exe pkg
+cp build/bin/QDash.exe pkg
