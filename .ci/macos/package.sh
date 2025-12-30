@@ -5,7 +5,7 @@
 
 cd build
 rm -rf QDash.app
-cp -r QDash/Native/QDash.app .
+cp -r bin/QDash.app .
 chmod a+x QDash.app/Contents/MacOS/QDash
 mkdir -p QDash.app/Contents/Resources
 cp ../dist/QDash.icns QDash.app/Contents/Resources

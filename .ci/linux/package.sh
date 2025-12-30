@@ -54,7 +54,7 @@ export OUTNAME=QDash-"$VERSION"-"$ARCH".AppImage
 # Deploy dependencies
 wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
 chmod +x ./quick-sharun
-./quick-sharun "$BUILDDIR"/QDash/Native/QDash
+./quick-sharun "$BUILDDIR"/bin/QDash
 
 # MAKE APPIMAGE WITH URUNTIME
 wget --retry-connrefused --tries=30 "$URUNTIME" -O ./uruntime2appimage
