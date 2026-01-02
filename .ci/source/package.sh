@@ -10,4 +10,4 @@ ROOTDIR="$PWD"
 
 cd "${PROJECT_REPO}"
 
-tar --zstd -cf ../source.tar.zst ./* .cache .patch
+tar --zstd -cf ../source.tar.zst ./* .cache
