@@ -62,7 +62,7 @@ jobs:
           .ci/common/configure.sh -DCCACHE_PATH=${SCCACHE_PATH} \
             -DCMAKE_PREFIX_PATH="${{ github.workspace }}/Qt/6.7.3" \
             -DQt6_DIR="${{ github.workspace }}/Qt/6.7.3/lib/cmake/Qt6" \
-            -DCMAKE_MODULE_PATH="${{ github.workspace }}/Qt/6.7.3/lib/cmake/Qt6"
+            -DCMAKE_MODULE_PATH="${{ github.workspace }}/Qt/6.7.3/lib/cmake/Qt6" \
             --debug-find-pkg=WrapResolv
 
       - name: Build
