@@ -60,7 +60,7 @@ jobs:
         run: |
           ls "${{ github.workspace }}/Qt/6.7.3/lib/cmake/Qt6"
           .ci/common/configure.sh -DCCACHE_PATH=${SCCACHE_PATH} \
-          -DCMAKE_PREFIX_PATH="${{ github.workspace }}/Qt/6.7.3/lib/cmake" \
+          -DCMAKE_PREFIX_PATH="${{ github.workspace }}/Qt/6.7.3" \
           -DCMAKE_MODULE_PATH="${{ github.workspace }}/Qt/6.7.3/lib/cmake/Qt6"
 
       - name: Build
