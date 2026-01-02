@@ -28,8 +28,8 @@ download() {
 URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
 SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
-export ICON="$ROOTDIR/dist/org.Q-FRC-QDash.svg"
-export DESKTOP="$ROOTDIR/dist/org.Q-FRC-QDash.desktop"
+export ICON="$ROOTDIR/dist/org.Q-FRC.QDash.svg"
+export DESKTOP="$ROOTDIR/dist/org.Q-FRC.QDash.desktop"
 export OPTIMIZE_LAUNCH=1
 export DEPLOY_OPENGL=1
 export DEPLOY_VULKAN=1
