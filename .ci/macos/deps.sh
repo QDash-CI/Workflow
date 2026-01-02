@@ -9,6 +9,14 @@ brew install --formula --quiet \
   ninja \
   cmake \
   python \
-  git
+  git \
+  zlib \
+  zstd \
+  harfbuzz \
+  freetype \
+  libpng \
+  libjpeg-turbo \
+  libwebp \
+  libtiff
 
 pip install jinja2
