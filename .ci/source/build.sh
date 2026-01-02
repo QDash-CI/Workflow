@@ -1,0 +1,14 @@
+#!/bin/sh -ex
+
+# SPDX-FileCopyrightText: Copyright 2026 crueter
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# shellcheck disable=SC1091
+
+ROOTDIR="$PWD"
+. "$ROOTDIR"/.ci/common/project.sh
+
+cd "${PROJECT_REPO}"
+
+find tools -exec chmod a+x {} \;
+tools/cpmutil.sh package fetch -a

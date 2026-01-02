@@ -1,17 +1,11 @@
-# This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
-name: CMake on multiple platforms
+name: "[Master] Build Workflow"
 
 on:
   workflow_call:
     inputs:
-      build_type:
-        description: Type of build (Debug, Release, RelWithDebInfo, MinSizeRel)
-        type: string
-        default: Debug
       devel:
-        description: Whether or not this is a development build
-        type: string
+        description: 'Development mode (disables update checker, adds nightly qualifier)'
+        type: boolean
         default: true
       build-id:
         description: 'Identifier for workflows and caching'
@@ -19,309 +13,187 @@ on:
         default: 'master'
 
 env:
-  qt_version: 6.9.1
-  qt_modules: qtmultimedia
+  DISABLE_ARM: ${{ vars.DISABLE_ARM }}
+  SCCACHE_GHA_ENABLED: "true"
+  CCACHE: "true"
+  CPM_CACHE_VERSION: "v1"
+  FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+  DEVEL: ${{ inputs.devel }}
+  TEMP_PATCH_STATUS: "false"
+  TEMP_PATCH: "3086"
+  FORCE_PGO: "false"
 
 jobs:
-  summary:
-    name: "Summary"
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Parse Forgejo payload
-        shell: bash
-        run: |
-          export PAYLOAD_JSON='${{ toJSON(github.event.client_payload) }}'
-          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
-          ./.ci/parse.sh ${{ inputs.build-id }}
-
-      - name: Create job summary
-        run: |
-          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
-          ./.ci/summary.sh ${{ inputs.build-id }}
-
   clone:
-    name: "Clone"
+    outputs:
+      cachever: ${{ steps.out.outputs.cachever }}
+      pgo: ${{ steps.out.outputs.pgo }}
+    name: "Parse and Clone"
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5.0.0
         with:
           fetch-depth: 0
+
+      - name: Send Commit Status to Forgejo
+        if: ${{ inputs.build-id == 'master' || inputs.build-id == 'pull_request' }}
+        shell: bash
+        run: |
+          export FORGEJO_REPO="${{ github.event.client_payload.repository }}"
+          export FORGEJO_REF="${{ github.event.client_payload.ref }}"
+          python ./.ci/common/status.py pending
 
       - name: Parse Forgejo payload
         shell: bash
         run: |
-          export PAYLOAD_JSON='${{ toJSON(github.event.client_payload) }}'
-          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
-          ./.ci/parse.sh ${{ inputs.build-id }}
+          echo '${{ toJSON(github.event.client_payload) }}' > ./payload.json
+          cat payload.json
+          ./.ci/forgejo.sh --parse ${{ inputs.build-id }}
+
+      - name: Load payload environment
+        shell: bash
+        run: |
+          . ./.ci/fj/load-env.sh
+
+      # for some amazing reason you can't pass env vars to reusable workflows
+      - name: Setup Outputs
+        id: out
+        shell: bash
+        run: |
+          echo "cachever=${CPM_CACHE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "pgo=${FORCE_PGO}" >> "$GITHUB_OUTPUT"
 
       - name: Clone
         shell: bash
-        run: ./.ci/clone.sh true
-
-      - name: Upload cloned repo
-        uses: actions/upload-artifact@v4
-        with:
-          name: QDash
-          path: |
-            QDash/*
-            QDash/.*
-
-  linux:
-    needs: [clone]
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runs-on: ubuntu-24.04
-            arch: amd64
-            pkg_arch: legacy
-
-          - runs-on: ubuntu-24.04-arm
-            arch: aarch64
-            pkg_arch: aarch64
-
-    runs-on: ${{ matrix.runs-on }}
-    name: "Linux (${{ matrix.arch }})"
-    container: ghcr.io/pkgforge-dev/archlinux:latest
-
-    steps:
-      - name: Install git
-        run: pacman -Syu --noconfirm git
-
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Install dependencies
         run: |
-          git config --global --add safe.directory $PWD
+          ./.ci/forgejo.sh --clone ${{ inputs.build-id }}
 
-          chmod +x ./.ci/linux/get-dependencies.sh
-          ./.ci/linux/get-dependencies.sh
-
-      - name: Setup CCache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ${{ runner.os }}-${{ matrix.arch }}-${{ inputs.build_type }}
-
-      - name: Parse Forgejo payload
+      - name: Apply Temporary Patch
+        if: ${{ env.TEMP_PATCH_STATUS == 'true' }}
         shell: bash
         run: |
-          export PAYLOAD_JSON='${{ toJSON(github.event.client_payload) }}'
-          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
-          ./.ci/parse.sh ${{ inputs.build-id }}
+          wget https://git.crueter.xyz/QFRC/QDash/pulls/${TEMP_PATCH}.patch
+          git -C QDash apply ../${TEMP_PATCH}.patch
+          rm ${TEMP_PATCH}.patch
 
-      - name: Clone
-        uses: actions/download-artifact@v4
-        with:
-          name: QDash
-
-      - name: Configure & Build
-        run: |
-          export TARGET=appimage
-          export BUILD_TYPE=${{ inputs.build_type }}
-          export USE_CCACHE=true
-
-          chmod a+x .ci/linux/build.sh
-          .ci/linux/build.sh ${{ matrix.pkg_arch }}
-
-      - name: Package (AppImage)
-        run: |
-          export DEVEL=${{ inputs.devel }}
-
-          chmod a+x .ci/linux/build.sh
-          .ci/linux/package.sh ${{ matrix.pkg_arch }}
-
-      - name: Package (binary)
-        run: |
-          cmake --install build --prefix install/usr
-
-          cd install
-          tar --owner root --group root --zstd -cf QDash.tar.zst *
-
-      - name: Upload Binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-binary-${{ matrix.arch }}
-          path: QDash.tar.zst
-
-      - name: Upload AppImage
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-appimage-${{ matrix.arch }}
-          path: ./*.AppImage*
-
-  windows:
-    needs: [clone]
-    name: "Windows (${{ matrix.arch }})"
-    runs-on: ${{ matrix.runs-on }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runs-on: windows-latest
-            arch: amd64
-
-          - runs-on: windows-11-arm
-            arch: arm64
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: ${{ env.qt_version }}
-          modules: ${{ env.qt_modules }}
-          cache: 'true'
-
-      - name: Set up MSVC
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: ${{ matrix.arch }}
-
-      - uses: repolevedavaj/install-nsis@v1.0.3
-        with:
-          nsis-version: 3.09
-
-      - name: Install Python Dependencies
-        run: |
-          pip install jinja2
-
-      - name: Setup CCache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ${{ runner.os }}-${{ matrix.arch }}-${{ inputs.build_type }}
-
-      - name: Parse Forgejo payload
+      - name: Summary
         shell: bash
         run: |
-          export PAYLOAD_JSON='${{ toJSON(github.event.client_payload) }}'
-          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
-          ./.ci/parse.sh ${{ inputs.build-id }}
+          ./.ci/fj/summary.sh ${{ inputs.build-id }}
 
-      - name: Clone
-        uses: actions/download-artifact@v4
-        with:
-          name: QDash
-
-      - name: Build
-        shell: bash
+      - name: Cleanup
         run: |
-          export DEVEL=true
-          export WINDEPLOYQT=windeployqt
-          export USE_CCACHE=true
+          rm -rf QDash/.git* QDash/.ci QDash/.github
 
-          ./.ci/windows/build.sh
-
-      - name: Package (Binary)
-        shell: bash
-        run: |
-          export ARCH=${{ matrix.arch }}
-          ./.ci/windows/package.sh
-
-      - name: Package (Installer)
-        shell: cmd
-        run: |
-          cd build/pkg
-          makensis -NOCD "../dist/win_install.nsi"
-
-      - name: Upload (Binary)
+      - name: Upload payload environment
         uses: actions/upload-artifact@v4.6.2
         with:
-          name: windows-${{ matrix.arch }}
-          path: artifacts/*
+          name: forgejo-env
+          path: forgejo.env
 
-      - name: Upload (Installer)
-        uses: actions/upload-artifact@v4
+      - name: Upload cloned repo
+        uses: actions/upload-artifact@v4.6.2
         with:
-          name: windows-setup-${{ matrix.arch }}
-          path: QDash-Setup.exe
+          name: QDash
+          include-hidden-files: true
+          path: |
+            QDash/*
+            QDash/.patch
 
-  macos:
+  source:
+    name: "Source Pack"
+    runs-on: ubuntu-latest
     needs: [clone]
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runs-on: macos-latest
-
-    runs-on: ${{ matrix.runs-on }}
-    name: "macOS (universal)"
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: ${{ env.qt_version }}
-          modules: ${{ env.qt_modules }}
-          cache: 'true'
-
-      - name: Install CMake
-        uses: lukka/get-cmake@v4.0.1
-
-      - name: Setup CCache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ${{ runner.os }}-${{ inputs.build_type }}
-
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.8
-          cache: 'pip'
-
-      - name: Install Dependencies
-        run: |
-          brew update
-          brew install llvm
-          pip install jinja2
-
-      - name: Parse Forgejo payload
-        shell: bash
-        run: |
-          export PAYLOAD_JSON='${{ toJSON(github.event.client_payload) }}'
-          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
-          ./.ci/parse.sh ${{ inputs.build-id }}
+        uses: actions/checkout@v5.0.0
 
       - name: Clone
-        uses: actions/download-artifact@v4
-        with:
-          name: QDash
+        uses: actions/download-artifact@v5.0.0
 
-      - name: Configure & Build
-        run: |
-          export USE_CCACHE=true
-          export BUILD_TYPE=${{ inputs.build_type }}
-
-          chmod a+x .ci/macos/build.sh
-          .ci/macos/build.sh
+      - name: Build
+        run: ./.ci/source/build.sh
 
       - name: Package
-        run: |
-          export QML_SOURCES_PATHS="$QML2_IMPORT_PATH"
+        run: ./.ci/source/package.sh
 
-          chmod a+x .ci/macos/package.sh
-          .ci/macos/package.sh
-
-      - name: Upload app
-        uses: actions/upload-artifact@v4
+      - name: Upload source
+        uses: actions/upload-artifact@v4.6.2
         with:
-          name: macos-universal
-          path: QDash.tar.gz
+          name: source
+          path: source.*
+
+  linux:
+    name: "AppImage"
+    needs: [clone]
+    uses: ./.github/workflows/appimage.yml
+    with:
+      build-id: '${{ inputs.build-id }}'
+      cpm-cache-version: '${{ needs.clone.outputs.cachever }}'
+      devel: ${{ inputs.devel }}
+      force_pgo: ${{ needs.clone.outputs.pgo }}
+    secrets: inherit
+
+  windows:
+    name: "Windows"
+    needs: [clone]
+    uses: ./.github/workflows/windows.yml
+    with:
+      build-id: '${{ inputs.build-id }}'
+      cpm-cache-version: '${{ needs.clone.outputs.cachever }}'
+      devel: ${{ inputs.devel }}
+      force_pgo: ${{ needs.clone.outputs.pgo }}
+    secrets: inherit
+
+  macos:
+    name: "macOS"
+    needs: [clone]
+    uses: ./.github/workflows/macos.yml
+    with:
+      build-id: '${{ inputs.build-id }}'
+      cpm-cache-version: '${{ needs.clone.outputs.cachever }}'
+      devel: ${{ inputs.devel }}
+    secrets: inherit
+
+  status-if-cancelled:
+    name: "Send Cancelled Commit Status to Forgejo"
+    needs: [source, linux, windows, macos]
+    if: ${{ always() && cancelled() && ((inputs.build-id || '') == 'master' || (inputs.build-id || '') == 'pull_request') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5.0.0
+      - name: Load payload env and send status
+        run: |
+          export FORGEJO_REPO="${{ github.event.client_payload.repository }}"
+          export FORGEJO_REF="${{ github.event.client_payload.ref }}"
+          python3 ./.ci/common/status.py error
+
+  status-if-failure:
+    name: "Send Failure Commit Status to Forgejo"
+    needs: [source, linux, windows, macos]
+    if: ${{ always() && failure() && ((inputs.build-id || '') == 'master' || (inputs.build-id || '') == 'pull_request') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5.0.0
+      - name: Load payload env and send status
+        run: |
+          export FORGEJO_REPO="${{ github.event.client_payload.repository }}"
+          export FORGEJO_REF="${{ github.event.client_payload.ref }}"
+          python3 ./.ci/common/status.py failure
+
+  status-if-success:
+    name: "Send Success Commit Status to Forgejo"
+    # TODO: ?ploo this
+    needs: [source, linux, windows, macos]
+    if: ${{ always() && success() && ((inputs.build-id || '') == 'master' || (inputs.build-id || '') == 'pull_request') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5.0.0
+      - name: Load payload env and send status
+        run: |
+          export FORGEJO_REPO="${{ github.event.client_payload.repository }}"
+          export FORGEJO_REF="${{ github.event.client_payload.ref }}"
+          python3 ./.ci/common/status.py success

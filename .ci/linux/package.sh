@@ -1,68 +1,78 @@
 #!/bin/sh -e
 
-# SPDX-FileCopyrightText: 2025 crueter
+# SPDX-FileCopyrightText: Copyright 2026 crueter
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # This script assumes you're in the source directory
 
+# shellcheck disable=SC1091
+
+ROOTDIR="$PWD"
+BUILDDIR="${BUILDDIR:-build}"
+. "$ROOTDIR"/.ci/common/project.sh
+
+download() {
+    url="$1"; out="$2"
+    if command -v wget >/dev/null 2>&1; then
+        wget --retry-connrefused --tries=30 "$url" -O "$out"
+    elif command -v curl >/dev/null 2>&1; then
+        curl -L --retry 30 -o "$out" "$url"
+    elif command -v fetch >/dev/null 2>&1; then
+        fetch -o "$out" "$url"
+    else
+        echo "Error: no downloader found." >&2
+        exit 1
+    fi
+}
+
 URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
 SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
-export ICON="$PWD"/dist/org.Q-FRC.QDash.svg
-export DESKTOP="$PWD"/dist/org.Q-FRC.QDash.desktop
+export ICON="$ROOTDIR/dist/org.Q-FRC-QDash.svg"
+export DESKTOP="$ROOTDIR/dist/org.Q-FRC-QDash.desktop"
 export OPTIMIZE_LAUNCH=1
+export DEPLOY_OPENGL=1
+export DEPLOY_VULKAN=1
 
-case "$1" in
-    amd64|"")
-        echo "Packaging amd64-v3 optimized build of QDash"
-        ARCH="amd64_v3"
-        ;;
-    steamdeck)
-        echo "Packaging Steam Deck (Zen 2) optimized build of QDash"
-        ARCH="steamdeck"
-        ;;
-    rog-ally|allyx)
-        echo "Packaging ROG Ally X (Zen 4) optimized build of QDash"
-        ARCH="rog-ally-x"
-        ;;
-    legacy)
-        echo "Packaging amd64 generic build of QDash"
-        ARCH=amd64
-        ;;
-    aarch64)
-        echo "Packaging armv8-a build of QDash"
-        ARCH=aarch64
-        ;;
-    armv9)
-        echo "Packaging armv9-a build of QDash"
-        ARCH=armv9
-        ;;
-esac
-
-if [ "$BUILDDIR" = '' ]
-then
-	BUILDDIR=build
+if [ -d "${BUILDDIR}/bin/Release" ]; then
+    strip -s "${BUILDDIR}/bin/Release/"*
+else
+    strip -s "${BUILDDIR}/bin/"*
 fi
 
-QDash_TAG=$(cat GIT-TAG)
-echo "Making \"$QDash_TAG\" build"
-VERSION="$QDash_TAG"
+VERSION=$(cat "$ROOTDIR/GIT-TAG" 2>/dev/null || echo 'v0.0.4-Workflow')
+echo "Making \"$VERSION\" build"
 
-export UPINFO="gh-releases-zsync|Q-FRC|QDash|latest|*$ARCH.AppImage.zsync"
-export OUTNAME=QDash-"$VERSION"-"$ARCH".AppImage
-
-# Deploy dependencies
-wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
-chmod +x ./quick-sharun
-./quick-sharun "$BUILDDIR"/bin/QDash
-
-# MAKE APPIMAGE WITH URUNTIME
-wget --retry-connrefused --tries=30 "$URUNTIME" -O ./uruntime2appimage
-chmod +x ./uruntime2appimage
-./uruntime2appimage
+export OUTNAME="$PROJECT_PRETTYNAME-Linux-$VERSION-$FULL_ARCH.AppImage"
+UPINFO="gh-releases-zsync|QDash-CI|Releases|latest|*-$FULL_ARCH.AppImage.zsync"
 
 if [ "$DEVEL" = 'true' ]; then
-    rm -f ./*.AppImage.zsync
+    case "$(uname)" in
+        FreeBSD|Darwin) sed -i '' "s|Name=${PROJECT_PRETTYNAME}|Name=${PROJECT_PRETTYNAME} Nightly|" "$DESKTOP" ;;
+        *) sed -i "s|Name=${PROJECT_PRETTYNAME}|Name=${PROJECT_PRETTYNAME} Nightly|" "$DESKTOP" ;;
+    esac
+    UPINFO="$(echo "$UPINFO" | sed 's|Releases|nightly|')"
 fi
 
-echo "All Done!"
+export UPINFO
+
+# deploy
+download "$SHARUN" "$ROOTDIR/quick-sharun"
+chmod +x "$ROOTDIR/quick-sharun"
+env LC_ALL=C "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
+
+# Wayland is mankind's worst invention, perhaps only behind war
+mkdir -p "$ROOTDIR/AppDir"
+echo 'QT_QPA_PLATFORM=xcb' >> "$ROOTDIR/AppDir/.env"
+
+# MAKE APPIMAGE WITH URUNTIME
+echo "Generating AppImage..."
+download "$URUNTIME" "$ROOTDIR/uruntime2appimage"
+chmod +x "$ROOTDIR/uruntime2appimage"
+"$ROOTDIR/uruntime2appimage"
+
+if [ "$DEVEL" = 'true' ]; then
+    rm -f "$ROOTDIR"/*.AppImage.zsync
+fi
+
+echo "Linux package created!"

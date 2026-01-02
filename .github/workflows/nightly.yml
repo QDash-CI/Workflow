@@ -1,19 +1,22 @@
-name: "[Auto] Master push"
+name: "Nightly"
 
 on:
-  repository_dispatch:
-    types: [master]
+  schedule:
+    - cron: '0 21 * * *'
+
 
 env:
   DISABLE_ARM: ${{ vars.DISABLE_ARM }}
-  FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
 
 jobs:
   build:
     name: Build
+    concurrency:
+      group: nightly-build
+      cancel-in-progress: false
     uses: ./.github/workflows/build.yml
     with:
-      build-id: 'master'
+      build-id: 'nightly'
     secrets: inherit
 
   release:
@@ -52,14 +55,14 @@ jobs:
           ./.ci/common/pack.sh
 
       - name: Generate changelog
-        run: ./.ci/changelog/generate.sh master > changelog.md
+        run: ./.ci/changelog/generate.sh nightly > changelog.md
 
       - name: Release
         if: ${{ env.GH_TOKEN }}
         id: release
         uses: softprops/action-gh-release@v2.2.2
         with:
-          name: "QDash Master - ${{ env.FORGEJO_REF }}"
+          name: "QDash Nightly ${{ env.FORGEJO_REF }}"
           tag_name: v${{ env.TIMESTAMP }}.${{ env.FORGEJO_REF }}
           repository: ${{ env.RELEASE_MASTER_REPO }}
           body_path: ./changelog.md
@@ -77,10 +80,6 @@ jobs:
           {
             echo "## Release Summary"
             echo ""
-            echo "- View Release on GitHub: [Master](${{ steps.release.outputs.url }})"
+            echo "- View Release on GitHub: [Continuous Build](${{ steps.release.outputs.url }})"
             echo ""
           } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Send release URL to status
-        run: |
-          python3 ./.ci/common/status.py release ${{ steps.release.outputs.url }}

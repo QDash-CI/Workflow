@@ -1,17 +1,23 @@
-name: Create Tag Release
+name: "[Auto] Tagged Release"
 
 on:
   repository_dispatch:
     types: [tag]
 
+env:
+  DISABLE_ARM: ${{ vars.DISABLE_ARM }}
+
 jobs:
   build:
     name: Build
+    concurrency:
+      group: tag-build
+      cancel-in-progress: true
     uses: ./.github/workflows/build.yml
     with:
-      build-type: 'Release'
       devel: false
       build-id: 'tag'
+    secrets: inherit
 
   release:
     name: "Create Release"
@@ -21,50 +27,85 @@ jobs:
       security-events: write
       contents: write
       discussions: write
-
+    env:
+      GH_TOKEN: "${{ secrets.CUSTOM_GITHUB_TOKEN }}"
+      FJ_TOKEN: "${{ secrets.FORGEJO_TOKEN }}"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5.0.0
         with:
           persist-credentials: false
 
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5.0.0
 
-      - name: Parse Forgejo payload
+      - name: Load payload environment
         shell: bash
         run: |
-          export PAYLOAD_JSON='${{ toJSON(github.event.client_payload) }}'
-          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
-          ./.ci/parse.sh tag
+          export FORGEJO_LENV=forgejo-env/forgejo.env
+          . ./.ci/fj/load-env.sh
 
-      # TODO(crueter): Host on my Git
       - name: Set environment variables
         run: |
-          echo "REPO=QDash-CI/Releases" >> $GITHUB_ENV
           echo "DEVEL=false" >> $GITHUB_ENV
-          echo "BUILD=tag" >> $GITHUB_ENV
+
+          case "${{ env.FORGEJO_REF }}" in
+            (*rc*|*alpha*|*beta*)
+              echo "TRACK=beta" >> $GITHUB_ENV
+              ;;
+            (*)
+              echo "TRACK=production" >> $GITHUB_ENV
+              ;;
+          esac
 
       - name: Package artifacts nicely
         run: |
           export ID=${FORGEJO_REF}
-          ./.ci/pack.sh
+          ./.ci/common/pack.sh
 
-      - name: Generate changelog
-        run: ./.ci/changelog/generate.sh > changelog.md
+      - name: Generate changelog(s)
+        run: |
+          ./.ci/changelog/generate.sh tag > changelog.md
+          mkdir -p whatsnew
+          echo "See the changelog here: https://$RELEASE_TAG_HOST/$RELEASE_TAG_REPO/releases/tag/${{ env.FORGEJO_REF }}" > whatsnew/whatsnew-en-US
+
+      # - uses: r0adkll/upload-google-play@v1.1.3
+      #   with:
+      #     serviceAccountJsonPlainText: ${{ secrets.PLAY_CREDENTIALS }}
+      #     packageName: dev.eden.eden_emulator
+      #     track: ${{ env.TRACK }}
+      #     releaseFiles: android-aab/*.aab
+      #     whatsNewDirectory: whatsnew
+      #     releaseName: ${{ env.FORGEJO_REF }}
 
       - name: Release
+        if: ${{ env.GH_TOKEN }}
+        id: release
         uses: softprops/action-gh-release@v2.2.2
         with:
           name: "QDash ${{ env.FORGEJO_REF }}"
           tag_name: ${{ env.FORGEJO_REF }}
-          repository: ${{ env.REPO }}
+          repository: ${{ env.RELEASE_TAG_REPO }}
           body_path: ./changelog.md
           prerelease: false
           draft: true
           generate_release_notes: false
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          token: ${{ env.GH_TOKEN }}
           fail_on_unmatched_files: false
           make_latest: true
           files: |
             artifacts/*
+
+      - name: Add release URL to summary
+        run: |
+          {
+            echo "## Release Summary"
+            echo ""
+            echo "- View Release on GitHub: [${{ env.FORGEJO_REF }}](${{ steps.release.outputs.url }})"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Forgejo Release
+        if: ${{ env.FJ_TOKEN }}
+        run: |
+          ./.ci/fj/release.sh
+          echo "- View Release on Forgejo: [${{ env.FORGEJO_REF }}]($(cat url))" >> "$GITHUB_STEP_SUMMARY"

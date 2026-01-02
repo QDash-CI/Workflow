@@ -1,21 +1,24 @@
-name: Test and Nightly Build
+name: "[Manual] Master branch test"
 
 on:
   push:
     branches:
       - 'master'
-  pull_request:
-    branches:
-      - '*'
-  schedule:
-    - cron: '0 21 * * *'
+  workflow_dispatch:
+
+env:
+  DISABLE_ARM: ${{ vars.DISABLE_ARM }}
 
 jobs:
   build:
     name: Build
+    concurrency:
+      group: push-build
+      cancel-in-progress: false
     uses: ./.github/workflows/build.yml
     with:
-      build-id: push
+      build-id: 'push'
+    secrets: inherit
 
   release:
     name: "Create Release"
@@ -25,57 +28,59 @@ jobs:
       security-events: write
       contents: write
       discussions: write
-
+    env:
+      GH_TOKEN: "${{ secrets.CUSTOM_GITHUB_TOKEN }}"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5.0.0
         with:
           persist-credentials: false
 
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5.0.0
 
-      - name: Parse Forgejo payload
+      - name: Load payload environment
         shell: bash
         run: |
-          export PAYLOAD_JSON='${{ toJSON(github.event.client_payload) }}'
-          export FORGEJO_TOKEN=${{ secrets.FORGEJO_TOKEN }}
-          ./.ci/parse.sh master
+          export FORGEJO_LENV=forgejo-env/forgejo.env
+          . ./.ci/fj/load-env.sh
 
       - name: Set environment variables
         run: |
-          echo "REPO=QDash-CI/Test" >> $GITHUB_ENV
           echo "DEVEL=true" >> $GITHUB_ENV
-          echo "BUILD=test" >> $GITHUB_ENV
+          echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
 
       - name: Package artifacts nicely
         run: |
-          export ID=continuous
-          ./.ci/pack.sh
+          export ID=${FORGEJO_REF}
+          ./.ci/common/pack.sh
 
       - name: Generate changelog
-        run: ./.ci/changelog/generate.sh > changelog.md
-
-      - name: Delete Previous Release
-        run: |
-          gh release delete "continuous" --repo "$REPO" --cleanup-tag  -y
-          sleep 5
-        env:
-          GH_TOKEN: "${{ secrets.CUSTOM_GITHUB_TOKEN }}"
-        continue-on-error: true
+        run: ./.ci/changelog/generate.sh push > changelog.md
 
       - name: Release
+        if: ${{ env.GH_TOKEN }}
+        id: release
         uses: softprops/action-gh-release@v2.2.2
         with:
-          name: "QDash - Continuous Build"
-          tag_name: continuous
-          repository: ${{ env.REPO }}
+          name: "QDash Continuous Build - ${{ env.FORGEJO_REF }}"
+          tag_name: v${{ env.TIMESTAMP }}.${{ env.FORGEJO_REF }}
+          repository: ${{ env.RELEASE_MASTER_REPO }}
           body_path: ./changelog.md
           prerelease: false
           draft: false
           generate_release_notes: false
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          token: ${{ env.GH_TOKEN }}
           fail_on_unmatched_files: false
           make_latest: true
           files: |
             artifacts/*
+
+      - name: Add release URL to summary
+        run: |
+          {
+            echo "## Release Summary"
+            echo ""
+            echo "- View Release on GitHub: [Continuous Build](${{ steps.release.outputs.url }})"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"

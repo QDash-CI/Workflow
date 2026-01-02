@@ -1,49 +1,24 @@
-#!/bin/sh -ex
+#!/bin/sh -e
 
-# SPDX-FileCopyrightText: 2025 crueter
+# SPDX-FileCopyrightText: Copyright 2026 crueter
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-cd build
-rm -rf QDash.app
-cp -r bin/QDash.app .
-chmod a+x QDash.app/Contents/MacOS/QDash
-mkdir -p QDash.app/Contents/Resources
-cp ../dist/QDash.icns QDash.app/Contents/Resources
-cp ../dist/App.entitlements QDash.app/Contents/Resources
+# credit: escary and hauntek
 
-unset DYLD_LIBRARY_PATH
-unset DYLD_FRAMEWORK_PATH
+ROOTDIR="$PWD"
 
-macdeployqt QDash.app \
-            -qmldir=../QDash \
-            -qmlimport=$QML_SOURCES_PATHS \
-            -verbose=2
+# shellcheck disable=SC1091
+. "$ROOTDIR"/.ci/common/project.sh
 
-macdeployqt QDash.app \
-            -qmldir=../QDash \
-            -qmlimport=$QML_SOURCES_PATHS \
-            -verbose=2 \
-            -always-overwrite
+BUILDDIR="${BUILDDIR:-build}"
+ARTIFACTS_DIR="$ROOTDIR/artifacts"
+APP="${PROJECT_REPO}.app"
 
-APP=QDash.app
+cd "$BUILDDIR/bin"
 
-# FixMachOLibraryPaths
-find "$APP/Contents/Frameworks" ""$APP/Contents/MacOS"" -type f \( -name "*.dylib" -o -perm +111 \) | while read file; do
-    if file "$file" | grep -q "Mach-O"; then
-        otool -L "$file" | awk '/@rpath\// {print $1}' | while read lib; do
-            lib_name="${lib##*/}"
-            new_path="@executable_path/../Frameworks/$lib_name"
-            install_name_tool -change "$lib" "$new_path" "$file"
-        done
+codesign --deep --force --verbose --sign - "$APP"
 
-        if [[ "$file" == *.dylib ]]; then
-            lib_name="${file##*/}"
-            new_id="@executable_path/../Frameworks/$lib_name"
-            install_name_tool -id "$new_id" "$file"
-        fi
-    fi
-done
+mkdir -p "$ARTIFACTS_DIR"
+tar czf "$ARTIFACTS_DIR/${PROJECT_REPO}.tar.gz" "$APP"
 
-# TODO: sign w/ real identity?
-codesign --force --deep --entitlements ../dist/App.entitlements -s - QDash.app
-tar czf ../QDash.tar.gz QDash.app
+echo "MacOS package created at $ARTIFACTS_DIR/${PROJECT_REPO}.tar.gz"
