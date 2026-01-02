@@ -57,8 +57,8 @@ jobs:
           rm qt.tar.gz
 
       - name: Configure
-        run: .ci/common/configure.sh \
-          -DCCACHE_PATH=${SCCACHE_PATH} \
+        run: |
+          .ci/common/configure.sh -DCCACHE_PATH=${SCCACHE_PATH} \
           -DCMAKE_PREFIX_PATH="${{ github.workspace }}/Qt/6.7.3/lib/cmake" \
           -DCMAKE_MODULE_PATH="${{ github.workspace }}/Qt/6.7.3/lib/cmake/Qt"
 
