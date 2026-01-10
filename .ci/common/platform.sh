@@ -13,6 +13,8 @@ QT=OFF
 # special case for Windows (FU microsoft)
 if [ -n "$VCINSTALLDIR" ]; then
 	PLATFORM=win
+	QT=ON
+	STATIC=ON
 	[ "$COMPILER" = "clang" ] && SUPPORTS_TARGETS=ON
 
 	# LTO is completely broken on MSVC

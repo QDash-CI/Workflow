@@ -16,6 +16,8 @@ brew install --formula --quiet \
   freetype \
   libpng \
   libjpeg-turbo \
-  libtiff
+  libtiff \
+  jbigkit \
+  ffmpeg
 
 pip install jinja2
