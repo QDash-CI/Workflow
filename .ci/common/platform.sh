@@ -8,6 +8,8 @@
 uname -s
 
 LTO=ON
+QT=OFF
+
 # special case for Windows (FU microsoft)
 if [ -n "$VCINSTALLDIR" ]; then
 	PLATFORM=win
@@ -24,12 +26,14 @@ else
 	Darwin*)
 		PLATFORM=macos
 		STATIC=ON
+		QT=ON
 		export LIBVULKAN_PATH="/opt/homebrew/lib/libvulkan.1.dylib"
 		;;
 	CYGWIN* | MINGW* | MSYS*)
 		PLATFORM=msys
 		STATIC=ON
 		SUPPORTS_TARGETS=ON
+		QT=ON
 
 		export PATH="$PATH:/mingw64/bin"
 
@@ -47,5 +51,6 @@ export PLATFORM
 export LTO
 export SUPPORTS_TARGETS
 export STATIC
+export QT
 
 # TODO(crueter): document outputs n such

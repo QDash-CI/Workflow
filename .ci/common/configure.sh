@@ -59,6 +59,9 @@ COMMON_FLAGS=(
 
 	# LTO
 	-DENABLE_LTO="${LTO:-OFF}"
+
+	# Bundled Qt
+	-DQDASH_BUNDLE_QT="${BUNDLE_QT:-OFF}"
 )
 
 # cmd line stuff

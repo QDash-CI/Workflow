@@ -48,22 +48,9 @@ jobs:
       - name: Install dependencies
         run: ./.ci/macos/deps.sh
 
-      - name: Install Qt
-        run: |
-          mkdir -p Qt/6.7.3
-          cd Qt/6.7.3
-          curl -L -o qt.tar.gz https://github.com/eden-emulator/QtStatic/releases/download/6.7.3/qt-6.7.3-macos.tar.gz
-          tar xf qt.tar.gz
-          rm qt.tar.gz
-
       - name: Configure
         run: |
-          ls "${{ github.workspace }}/Qt/6.7.3/lib/cmake/Qt6"
-          .ci/common/configure.sh -DCCACHE_PATH=${SCCACHE_PATH} \
-            -DCMAKE_PREFIX_PATH="${{ github.workspace }}/Qt/6.7.3" \
-            -DQt6_DIR="${{ github.workspace }}/Qt/6.7.3/lib/cmake/Qt6" \
-            -DCMAKE_MODULE_PATH="${{ github.workspace }}/Qt/6.7.3/lib/cmake/Qt6"
-            --debug-find-pkg=WrapResolv
+          .ci/common/configure.sh
 
       - name: Build
         run: cmake --build build
