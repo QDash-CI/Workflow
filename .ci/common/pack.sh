@@ -38,20 +38,6 @@ for arch in $ARCHES; do
 	done
 done
 
-## Debian ##
-ARCHES=amd64
-opts && tagged && ARCHES="$ARCHES aarch64"
-
-for arch in $ARCHES; do
-	for ver in 24.04; do
-		cp "$ROOTDIR/ubuntu-$ver-$arch"/*.deb "$ARTIFACTS_DIR/${PROJECT_PRETTYNAME}-Ubuntu-$ver-${ID}-$arch.deb"
-	done
-
-	for ver in 12 13; do
-		cp "$ROOTDIR/debian-$ver-$arch"/*.deb "$ARTIFACTS_DIR/${PROJECT_PRETTYNAME}-Debian-$ver-${ID}-$arch.deb"
-	done
-done
-
 ## Android ##
 if falsy "$DISABLE_ANDROID"; then
 	FLAVORS="standard chromeos"
@@ -93,6 +79,4 @@ fi
 cp "$ROOTDIR/macos"/*.tar.gz "$ARTIFACTS_DIR/${PROJECT_PRETTYNAME}-macOS-${ID}.tar.gz"
 
 ## FreeBSD and other stuff ##
-cp "$ROOTDIR/freebsd-binary-amd64-clang"/*.tar.zst "$ARTIFACTS_DIR/${PROJECT_PRETTYNAME}-FreeBSD-${ID}-amd64-clang.tar.zst"
-
 ls "$ARTIFACTS_DIR"
