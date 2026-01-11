@@ -98,7 +98,6 @@ jobs:
           draft: false
           generate_release_notes: false
           fail_on_unmatched_files: false
-          discussion_category_name: "PRs"
           make_latest: true
 
       - name: Add release URL to summary
