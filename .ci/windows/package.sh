@@ -75,7 +75,10 @@ if [ "$PLATFORM" = "msys" ] && [ "$STATIC" != "ON" ]; then
 fi
 
 # ?ploo
-ZIP_NAME="${PROJECT_PRETTYNAME}-Windows-${ARCH}.zip"
+# TODO(crueter): Pass VERSION in akin to the final one used in pack etc.
+ZIP_NAME="${PROJECT_PRETTYNAME}-Windows-${FORGEJO_REF}-${ARCH}.zip"
+
+# ZIP_NAME="${PROJECT_PRETTYNAME}-Windows-${ARCH}.zip"
 
 cp -r ./* "$TMP_DIR"/
 cp -r "$ROOTDIR"/LICENSE* "$ROOTDIR"/README* "$TMP_DIR"/
@@ -83,3 +86,11 @@ cp -r "$ROOTDIR"/LICENSE* "$ROOTDIR"/README* "$TMP_DIR"/
 7z a -tzip "$ARTIFACTS_DIR/$ZIP_NAME" "$TMP_DIR"/*
 
 rm -rf "$TMP_DIR"
+
+# Setup files
+if truthy "$SETUP"; then
+	makensis -NOCD "../dist/win_install.nsi"
+
+	cd "$ROOTDIR"
+	mv "${PROJECT_PRETTYNAME}-Setup" "${PROJECT_PRETTYNAME}-Windows-Installer-${FORGEJO_REF}-${ARCH}.exe"
+fi

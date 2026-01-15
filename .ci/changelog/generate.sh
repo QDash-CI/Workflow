@@ -8,6 +8,7 @@
 ROOTDIR="$PWD"
 . "$ROOTDIR"/.ci/common/project.sh
 
+# TODO(crueter): pass tag etc. from elsewhere
 case "$1" in
 master)
 	TAG="v${TIMESTAMP}.${FORGEJO_REF}"
@@ -170,16 +171,24 @@ msys() {
     TARGET="$4"
 	NOTES="$5"
 
+	if [ "$INSTALLER" = true ]; then
+		_platform=Windows-Installer
+	else
+		_platform=Windows
+	fi
+
 	echo -n "| $LABEL | "
-	echo -n "[amd64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-Windows-${REF}-mingw-amd64-${AMD}-${TARGET}.zip) | "
-	echo -n "[arm64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-Windows-${REF}-mingw-arm64-${ARM}-${TARGET}.zip) | "
+	echo -n "[amd64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-${_platform}-${REF}-mingw-amd64-${AMD}-${TARGET}.zip) | "
+	echo -n "[arm64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-${_platform}-${REF}-mingw-arm64-${ARM}-${TARGET}.zip) | "
 
 	echo "$NOTES"
 }
 
 win_matrix() {
-	win_field MSVC msvc-standard
+	win_field "MSVC, Portable" msvc-standard
+	falsy "$SETUP" || INSTALLER=true win_field "MSVC, Setup" msvc-standard
 
+	# TODO(crueter): MiNGW setup stuff
 	if falsy "$DISABLE_MINGW"; then
 		msys "MinGW" gcc clang standard "May have additional bugs/glitches"
 		opts && tagged && msys "MinGW PGO" clang clang pgo || true

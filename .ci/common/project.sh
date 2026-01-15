@@ -27,6 +27,9 @@ DISABLE_MSVC_ARM=OFF
 # Does your project need to explain targets?
 EXPLAIN_TARGETS=OFF
 
+# Do you have a Windows Setup/Installer target?
+SETUP=ON
+
 export PROJECT_PRETTYNAME
 export PROJECT_REPO
 
@@ -37,6 +40,7 @@ export DISABLE_MINGW
 export DISABLE_MSVC_ARM
 
 export EXPLAIN_TARGETS
+export SETUP
 
 truthy() {
 	LOWER=$(echo "$1" | tr '[:upper:]' '[:lower:]')
