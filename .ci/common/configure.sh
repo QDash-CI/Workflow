@@ -62,6 +62,10 @@ COMMON_FLAGS=(
 
 	# Bundled Qt
 	-DQDASH_BUNDLE_QT="${QT:-OFF}"
+
+	# default widgets
+	-DQDASH_CAMVIEW=ON
+	-DQDASH_NETWORK=ON
 )
 
 # cmd line stuff
