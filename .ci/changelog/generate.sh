@@ -157,9 +157,17 @@ win_field() {
 	COMPILER="$2"
 	NOTES="$3"
 
+	if [ "$INSTALLER" = true ]; then
+		_platform=Windows-Installer
+		_ext=exe
+	else
+		_platform=Windows
+		_ext=zip
+	fi
+
 	echo -n "| $LABEL | "
-	echo -n "[amd64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-Windows-${REF}-amd64-${COMPILER}.zip) | "
-	falsy "$DISABLE_MSVC_ARM" && echo -n "[arm64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-Windows-${REF}-arm64-${COMPILER}.zip)"
+	echo -n "[amd64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-Windows-${REF}-amd64-${COMPILER}.${_ext}) | "
+	falsy "$DISABLE_MSVC_ARM" && echo -n "[arm64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-Windows-${REF}-arm64-${COMPILER}.${_ext})"
 
 	echo " | $NOTES"
 }
@@ -173,13 +181,15 @@ msys() {
 
 	if [ "$INSTALLER" = true ]; then
 		_platform=Windows-Installer
+		_ext=exe
 	else
 		_platform=Windows
+		_ext=zip
 	fi
 
 	echo -n "| $LABEL | "
-	echo -n "[amd64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-${_platform}-${REF}-mingw-amd64-${AMD}-${TARGET}.zip) | "
-	echo -n "[arm64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-${_platform}-${REF}-mingw-arm64-${ARM}-${TARGET}.zip) | "
+	echo -n "[amd64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-${_platform}-${REF}-mingw-amd64-${AMD}-${TARGET}.${_ext}) | "
+	echo -n "[arm64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-${_platform}-${REF}-mingw-arm64-${ARM}-${TARGET}.${_ext}) | "
 
 	echo "$NOTES"
 }
