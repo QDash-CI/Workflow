@@ -57,6 +57,7 @@ falsy "$DISABLE_MSVC_ARM" && ARCHES="$ARCHES arm64"
 for arch in $ARCHES; do
 	for compiler in $COMPILERS; do
 		cp "$ROOTDIR/windows-$arch-$compiler"/*.zip "$ARTIFACTS_DIR/${PROJECT_PRETTYNAME}-Windows-${ID}-${arch}-${compiler}.zip"
+		cp "$ROOTDIR/windows-$arch-$compiler-setup/"*.exe "$ARTIFACTS_DIR/${PROJECT_PRETTYNAME}-Windows-Installer-${ID}-${arch}-${compiler}.exe"
 	done
 done
 

@@ -54,6 +54,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5.0.0
 
+      - uses: repolevedavaj/install-nsis@v1.0.3
+        with:
+          nsis-version: 3.09
+
       - name: Setup
         uses: ./.github/workflows/setup
         with:
@@ -94,4 +98,11 @@ jobs:
         with:
           name: windows-${{ env.ARCH }}
           path: artifacts/*
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: windows-${{ env.ARCH }}-setup
+          path: ./*-Setup.exe
+
 

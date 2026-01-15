@@ -65,7 +65,7 @@ jobs:
         with:
           name: "QDash Nightly ${{ env.FORGEJO_REF }}"
           tag_name: v${{ env.TIMESTAMP }}.${{ env.FORGEJO_REF }}
-          repository: ${{ env.RELEASE_MASTER_REPO }}
+          repository: ${{ env.RELEASE_NIGHTLY_REPO }}
           body_path: ./changelog.md
           prerelease: false
           draft: false
