@@ -166,8 +166,8 @@ win_field() {
 	fi
 
 	echo -n "| $LABEL | "
-	echo -n "[amd64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-Windows-${REF}-amd64-${COMPILER}.${_ext}) | "
-	falsy "$DISABLE_MSVC_ARM" && echo -n "[arm64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-Windows-${REF}-arm64-${COMPILER}.${_ext})"
+	echo -n "[amd64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-${_platform}-${REF}-amd64-${COMPILER}.${_ext}) | "
+	falsy "$DISABLE_MSVC_ARM" && echo -n "[arm64](${BASE_DOWNLOAD_URL}/${TAG}/${PROJECT_PRETTYNAME}-${_platform}-${REF}-arm64-${COMPILER}.${_ext})"
 
 	echo " | $NOTES"
 }
