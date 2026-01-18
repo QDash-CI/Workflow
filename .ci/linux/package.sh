@@ -65,10 +65,6 @@ env LC_ALL=C "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
 mkdir -p "$ROOTDIR/AppDir"
 echo 'QT_QPA_PLATFORM=xcb' >> "$ROOTDIR/AppDir/.env"
 
-# Delete broken hasvk and nouveau stuff
-find ./AppDir -type f \( -name '*nouveau*' -o -name '*hasvk*' \)
-find ./AppDir -type f \( -name '*nouveau*' -o -name '*hasvk*' \) -delete
-
 # MAKE APPIMAGE WITH URUNTIME
 echo "Generating AppImage..."
 download "$URUNTIME" "$ROOTDIR/uruntime2appimage"
