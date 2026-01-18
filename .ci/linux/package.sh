@@ -31,7 +31,7 @@ SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/h
 export ICON="$ROOTDIR/dist/org.Q-FRC.QDash.svg"
 export DESKTOP="$ROOTDIR/dist/org.Q-FRC.QDash.desktop"
 export OPTIMIZE_LAUNCH=1
-export DEPLOY_OPENGL=0
+export DEPLOY_OPENGL=1
 export DEPLOY_VULKAN=0
 
 if [ -d "${BUILDDIR}/bin/Release" ]; then
