@@ -65,6 +65,9 @@ env LC_ALL=C "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
 mkdir -p "$ROOTDIR/AppDir"
 echo 'QT_QPA_PLATFORM=xcb' >> "$ROOTDIR/AppDir/.env"
 
+# fluent is unneeded and kind of fat
+rm -rf "$ROOTDIR"/AppDir/shared/lib/qt6/qml/QtQuick/Controls/FluentWinUI3
+
 # MAKE APPIMAGE WITH URUNTIME
 echo "Generating AppImage..."
 download "$URUNTIME" "$ROOTDIR/uruntime2appimage"
