@@ -22,7 +22,6 @@ pacman -Syu --noconfirm \
 		qt6-multimedia \
 		qt6-multimedia-ffmpeg \
 		qt6-tools \
-		qt6-wayland \
 		strace \
 		unzip \
 		wget \
