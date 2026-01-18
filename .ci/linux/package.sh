@@ -31,8 +31,8 @@ SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/h
 export ICON="$ROOTDIR/dist/org.Q-FRC.QDash.svg"
 export DESKTOP="$ROOTDIR/dist/org.Q-FRC.QDash.desktop"
 export OPTIMIZE_LAUNCH=1
-export DEPLOY_OPENGL=1
-export DEPLOY_VULKAN=1
+export DEPLOY_OPENGL=0
+export DEPLOY_VULKAN=0
 
 if [ -d "${BUILDDIR}/bin/Release" ]; then
     strip -s "${BUILDDIR}/bin/Release/"*
@@ -64,10 +64,6 @@ env LC_ALL=C "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
 # Wayland is mankind's worst invention, perhaps only behind war
 mkdir -p "$ROOTDIR/AppDir"
 echo 'QT_QPA_PLATFORM=xcb' >> "$ROOTDIR/AppDir/.env"
-
-# Delete broken hasvk and nouveau stuff
-find ./AppDir -type f \( -name '*nouveau*' -o -name '*hasvk*' \)
-find ./AppDir -type f \( -name '*nouveau*' -o -name '*hasvk*' \) -delete
 
 # MAKE APPIMAGE WITH URUNTIME
 echo "Generating AppImage..."
