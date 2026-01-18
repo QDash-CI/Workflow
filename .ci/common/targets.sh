@@ -6,7 +6,7 @@
 # only clang and gcc support this
 if [ -n "$SUPPORTS_TARGETS" ]; then
 	case "$TARGET" in
-		amd64)
+		v3)
 			echo "Making amd64-v3 optimized build of ${PROJECT_PRETTYNAME}"
 			ARCH_FLAGS="-march=x86-64-v3 -mtune=generic"
 			ARCH="amd64"
@@ -21,7 +21,7 @@ if [ -n "$SUPPORTS_TARGETS" ]; then
 			ARCH_FLAGS="-march=znver4 -mtune=znver4"
 			ARCH="rog-ally-x"
 			;;
-		legacy)
+		amd64|generic)
 			echo "Making amd64 generic build of ${PROJECT_PRETTYNAME}"
 			ARCH_FLAGS="-march=x86-64 -mtune=generic"
 			ARCH=legacy
