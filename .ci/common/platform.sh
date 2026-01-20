@@ -10,7 +10,7 @@ uname -s
 LTO=ON
 QT=OFF
 
-# special case for Windows
+# special case for Windows (FU microsoft)
 if [ -n "$VCINSTALLDIR" ]; then
 	PLATFORM=win
 	QT=ON
@@ -24,7 +24,6 @@ else
 	Linux*)
 		PLATFORM=linux
 		SUPPORTS_TARGETS=ON
-		QT=ON
 		;;
 	Darwin*)
 		PLATFORM=macos
