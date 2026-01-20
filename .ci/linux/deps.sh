@@ -15,9 +15,11 @@ pacman -Syu --noconfirm \
 		cmake \
 		curl \
 		jq \
+		libssh \
 		libxkbcommon-x11 \
 		ninja \
 		patchelf \
+		pulseaudio \
 		python-pip \
 		python-jinja \
 		strace \
