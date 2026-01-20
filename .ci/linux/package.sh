@@ -75,10 +75,9 @@ echo 'QT_QPA_PLATFORM=xcb' >> "$ROOTDIR/AppDir/.env"
 _qtdst="$ROOTDIR"/AppDir/shared/lib/qt6/qml
 
 if [ "$QT" = "ON" ]; then
-	set -- "$ROOTDIR"/.cache/cpm/qt6/linux-*/
+	set -- "$ROOTDIR"/.cache/cpm/qt6/linux-*
 	_qmldir="$1/qml"
 	_plgdir="$1/plugins"
-	_trndir="$1/translations"
 
 	if [ ! -d "$_qmldir" ]; then
 		echo "-- No QML files found at $_qmldir"
@@ -90,14 +89,8 @@ if [ "$QT" = "ON" ]; then
 		exit 1
 	fi
 
-	if [ ! -d "$_trndir" ]; then
-		echo "-- No translations files found at $_trndir"
-		exit 1
-	fi
-
-
 	mkdir -p "$_qtdst"
-	cp -r "$_qmldir" "$_plgdir" "$_trndir" "$_qtdst"
+	cp -r "$_qmldir" "$_plgdir" "$_qtdst"
 fi
 
 # fluent is unneeded and kind of fat
