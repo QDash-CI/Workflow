@@ -15,6 +15,7 @@ pacman -Syu --noconfirm \
 		cmake \
 		curl \
 		jq \
+		libxkbcommon-x11 \
 		ninja \
 		patchelf \
 		python-pip \
