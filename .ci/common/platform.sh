@@ -24,6 +24,7 @@ else
 	Linux*)
 		PLATFORM=linux
 		SUPPORTS_TARGETS=ON
+		QT=ON
 		;;
 	Darwin*)
 		PLATFORM=macos
