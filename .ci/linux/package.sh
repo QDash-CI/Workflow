@@ -72,7 +72,7 @@ echo 'QT_QPA_PLATFORM=xcb' >> "$ROOTDIR/AppDir/.env"
 
 # manually copy qmldir
 if [ "$QT" = "ON" ]; then
-	qmldir=$(find "$ROOTDIR/.cache/cpm/qt6" -maxdepth 1 -type d)
+	qmldir=$(find "$ROOTDIR/.cache/cpm/qt6" -maxdepth 1 -mindepth 1 -type d)
 
 	if [ -z "$qmldir" ]; then
 		echo "-- No bundled Qt found at $ROOTDIR/.cache/cpm/qt6"
