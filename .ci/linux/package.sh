@@ -32,7 +32,7 @@ export ICON="$ROOTDIR/dist/org.Q-FRC.QDash.svg"
 export DESKTOP="$ROOTDIR/dist/org.Q-FRC.QDash.desktop"
 export OPTIMIZE_LAUNCH=1
 export DEPLOY_OPENGL=1
-export DEPLOY_VULKAN=1
+export DEPLOY_VULKAN=0
 
 if [ -d "${BUILDDIR}/bin/Release" ]; then
     strip -s "${BUILDDIR}/bin/Release/"*
@@ -65,9 +65,8 @@ env LC_ALL=C "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
 mkdir -p "$ROOTDIR/AppDir"
 echo 'QT_QPA_PLATFORM=xcb' >> "$ROOTDIR/AppDir/.env"
 
-# Delete broken hasvk and nouveau stuff
-find ./AppDir -type f \( -name '*nouveau*' -o -name '*hasvk*' \)
-find ./AppDir -type f \( -name '*nouveau*' -o -name '*hasvk*' \) -delete
+# fluent is unneeded and kind of fat
+rm -rf "$ROOTDIR"/AppDir/shared/lib/qt6/qml/QtQuick/Controls/FluentWinUI3
 
 # MAKE APPIMAGE WITH URUNTIME
 echo "Generating AppImage..."
