@@ -14,6 +14,8 @@ pacman -Syu --noconfirm \
 		ccache \
 		cmake \
 		curl \
+		fontconfig \
+		harfbuzz \
 		jq \
 		libssh \
 		libxkbcommon-x11 \
