@@ -10,7 +10,7 @@ uname -s
 LTO=ON
 QT=OFF
 
-# special case for Windows (FU microsoft)
+# special case for Windows
 if [ -n "$VCINSTALLDIR" ]; then
 	PLATFORM=win
 	QT=ON
