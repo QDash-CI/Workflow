@@ -10,6 +10,7 @@
 ROOTDIR="$PWD"
 BUILDDIR="${BUILDDIR:-build}"
 . "$ROOTDIR"/.ci/common/project.sh
+. "$ROOTDIR"/.ci/common/platform.sh
 
 download() {
     url="$1"; out="$2"
@@ -33,6 +34,11 @@ export DESKTOP="$ROOTDIR/dist/org.Q-FRC.QDash.desktop"
 export OPTIMIZE_LAUNCH=1
 export DEPLOY_OPENGL=1
 export DEPLOY_VULKAN=0
+
+if [ "$QT" = "ON" ]; then
+	export DEPLOY_QML=0
+	export DEPLOY_QT=0
+fi
 
 if [ -d "${BUILDDIR}/bin/Release" ]; then
     strip -s "${BUILDDIR}/bin/Release/"*
@@ -64,6 +70,28 @@ env LC_ALL=C "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
 # Wayland is mankind's worst invention, perhaps only behind war
 mkdir -p "$ROOTDIR/AppDir"
 echo 'QT_QPA_PLATFORM=xcb' >> "$ROOTDIR/AppDir/.env"
+
+# manually copy qmldir
+_qtdst="$ROOTDIR"/AppDir/shared/lib/qt6
+
+if [ "$QT" = "ON" ]; then
+	set -- "$ROOTDIR"/.cache/cpm/qt6/linux-*
+	_qmldir="$1/qml"
+	_plgdir="$1/plugins"
+
+	if [ ! -d "$_qmldir" ]; then
+		echo "-- No QML files found at $_qmldir"
+		exit 1
+	fi
+
+	if [ ! -d "$_plgdir" ]; then
+		echo "-- No plugin files found at $_plgdir"
+		exit 1
+	fi
+
+	mkdir -p "$_qtdst"
+	cp -r "$_qmldir" "$_plgdir" "$_qtdst"
+fi
 
 # fluent is unneeded and kind of fat
 rm -rf "$ROOTDIR"/AppDir/shared/lib/qt6/qml/QtQuick/Controls/FluentWinUI3
