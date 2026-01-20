@@ -72,7 +72,7 @@ mkdir -p "$ROOTDIR/AppDir"
 echo 'QT_QPA_PLATFORM=xcb' >> "$ROOTDIR/AppDir/.env"
 
 # manually copy qmldir
-_qtdst="$ROOTDIR"/AppDir/shared/lib/qt6/qml
+_qtdst="$ROOTDIR"/AppDir/shared/lib/qt6
 
 if [ "$QT" = "ON" ]; then
 	set -- "$ROOTDIR"/.cache/cpm/qt6/linux-*
