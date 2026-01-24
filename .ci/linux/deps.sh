@@ -18,6 +18,7 @@ pacman -Syu --noconfirm \
 		harfbuzz \
 		jq \
 		libssh \
+		libva \
 		libxkbcommon-x11 \
 		ninja \
 		patchelf \
@@ -40,3 +41,14 @@ echo "---------------------------------------------------------------"
 wget --retry-connrefused --tries=30 "$EXTRA_PACKAGES" -O ./get-debloated-pkgs.sh
 chmod +x ./get-debloated-pkgs.sh
 ./get-debloated-pkgs.sh --add-mesa --prefer-nano libxml2-mini opus-mini
+
+echo "Installing custom Qt..."
+echo "---------------------------------------------------------------"
+
+_ver=6.9.3
+_qtdir=/usr/lib/qt6
+_tdir=$(mktemp -d)
+_url=https://github.com/crueter-ci/Qt/releases/download/v$_ver/qt-archlinux-$TARGET-$_ver.tar.zst
+
+curl -L "$_url" -o qt.tar.zst
+tar xf qt.tar.zst -C /usr
