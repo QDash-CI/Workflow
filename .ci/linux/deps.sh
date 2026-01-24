@@ -52,13 +52,4 @@ _url=https://github.com/crueter-ci/Qt/releases/download/v$_ver/qt-linux-amd64-$_
 curl -L "$_url" -o qt.tar.zst
 mkdir -p $_qtdir "$_tdir"
 tar xf qt.tar.zst -C "$_tdir"
-cd "$_tdir"
-
-cp -r bin/* /usr/bin
-cp -r include/* /usr/include
-cp -r lib/* /usr/lib
-mv libexec /usr
-
-rm -rf bin include lib
-
-mv ./* "$_qtdir"
+cp -r "$_tdir"/* /usr
