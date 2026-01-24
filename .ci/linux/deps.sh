@@ -47,7 +47,7 @@ echo "---------------------------------------------------------------"
 _ver=6.9.3
 _qtdir=/usr/lib/qt6
 _tdir=$(mktemp -d)
-_url=https://github.com/crueter-ci/Qt/releases/download/v$_ver/qt-linux-amd64-$_ver.tar.zst
+_url=https://github.com/crueter-ci/Qt/releases/download/v$_ver/qt-linux-$TARGET-$_ver.tar.zst
 
 curl -L "$_url" -o qt.tar.zst
 mkdir -p $_qtdir "$_tdir"
