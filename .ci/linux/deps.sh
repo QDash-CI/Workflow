@@ -56,8 +56,9 @@ cd "$_tdir"
 
 cp -r bin/* /usr/bin
 cp -r include/* /usr/include
-cp -r lib/* libexec/* /usr/lib
+cp -r lib/* /usr/lib
+mv libexec /usr
 
-rm -rf bin include lib libexec
+rm -rf bin include lib
 
 mv ./* "$_qtdir"
