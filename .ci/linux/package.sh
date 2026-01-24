@@ -27,7 +27,9 @@ download() {
 }
 
 URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
-SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
+# SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
+# TMP
+SHARUN="https://github.com/crueter/Anylinux-AppImages/raw/refs/heads/patch-1/useful-tools/quick-sharun.sh"
 
 export ICON="$ROOTDIR/dist/org.Q-FRC.QDash.svg"
 export DESKTOP="$ROOTDIR/dist/org.Q-FRC.QDash.desktop"
@@ -65,7 +67,7 @@ export UPINFO
 # deploy
 download "$SHARUN" "$ROOTDIR/quick-sharun"
 chmod +x "$ROOTDIR/quick-sharun"
-env LC_ALL=C "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
+env LC_ALL=C QT_DIR=../ "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
 
 # Wayland is mankind's worst invention, perhaps only behind war
 mkdir -p "$ROOTDIR/AppDir"
