@@ -18,6 +18,7 @@ pacman -Syu --noconfirm \
 		harfbuzz \
 		jq \
 		libssh \
+		libva \
 		libxkbcommon-x11 \
 		ninja \
 		patchelf \
