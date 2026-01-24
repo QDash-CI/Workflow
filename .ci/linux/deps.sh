@@ -54,9 +54,10 @@ mkdir -p $_qtdir "$_tdir"
 tar xf qt.tar.zst -C "$_tdir"
 cd "$_tdir"
 
-mv bin/* /usr/bin
-mv include/* /usr/include
-mv lib/* /usr/lib
-mv libexec/* /usr/libexec
+cp -r bin/* /usr/bin
+cp -r include/* /usr/include
+cp -r lib/* libexec/* /usr/lib
+
+rm -rf bin include lib libexec
 
 mv ./* "$_qtdir"
