@@ -3,8 +3,6 @@
 # SPDX-FileCopyrightText: Copyright 2026 crueter
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# credit: escary and hauntek
-
 ROOTDIR="$PWD"
 
 # shellcheck disable=SC1091
@@ -17,6 +15,9 @@ APP="${PROJECT_REPO}.app"
 cd "$BUILDDIR/bin"
 
 codesign --deep --force --verbose --sign - "$APP"
+
+# test
+otool -L "$APP"/Contents/MacOS/"${PROJECT_REPO}"
 
 mkdir -p "$ARTIFACTS_DIR"
 tar czf "$ARTIFACTS_DIR/${PROJECT_REPO}.tar.gz" "$APP"
