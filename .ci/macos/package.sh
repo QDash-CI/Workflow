@@ -14,7 +14,7 @@ APP="${PROJECT_REPO}.app"
 
 cd "$BUILDDIR/bin"
 
-"$ROOTDIR"./.ci/macos/deploy.sh "$APP" "${PROJECT_REPO}"
+"$ROOTDIR"/.ci/macos/deploy.sh "$APP" "${PROJECT_REPO}"
 
 codesign --deep --force --verbose --sign - "$APP"
 
