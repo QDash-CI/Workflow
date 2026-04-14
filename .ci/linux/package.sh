@@ -67,7 +67,9 @@ export UPINFO
 # deploy
 download "$SHARUN" "$ROOTDIR/quick-sharun"
 chmod +x "$ROOTDIR/quick-sharun"
-env LC_ALL=C "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
+# env LC_ALL=C "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
+
+/bin/sh -x "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
 
 # Wayland is mankind's worst invention, perhaps only behind war
 mkdir -p "$ROOTDIR/AppDir"
