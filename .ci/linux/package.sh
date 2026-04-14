@@ -36,6 +36,7 @@ export DESKTOP="$ROOTDIR/dist/org.Q-FRC.QDash.desktop"
 export OPTIMIZE_LAUNCH=1
 export DEPLOY_OPENGL=1
 export DEPLOY_VULKAN=0
+export ADD_HOOKS="wayland-is-broken.hook"
 
 if [ "$QT" = "ON" ]; then
 	export DEPLOY_QML=0
@@ -72,8 +73,8 @@ chmod +x "$ROOTDIR/quick-sharun"
 /bin/sh -x "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
 
 # Wayland is mankind's worst invention, perhaps only behind war
-mkdir -p "$ROOTDIR/AppDir"
-echo 'QT_QPA_PLATFORM=xcb' >> "$ROOTDIR/AppDir/.env"
+# mkdir -p "$ROOTDIR/AppDir"
+# echo 'QT_QPA_PLATFORM=xcb' >> "$ROOTDIR/AppDir/.env"
 
 # fluent is unneeded and kind of fat
 rm -rf "$ROOTDIR"/AppDir/shared/lib/qt6/qml/QtQuick/Controls/FluentWinUI3
