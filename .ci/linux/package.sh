@@ -7,86 +7,44 @@
 
 # shellcheck disable=SC1091
 
-ROOTDIR="$PWD"
 BUILDDIR="${BUILDDIR:-build}"
-. "$ROOTDIR"/.ci/common/project.sh
-. "$ROOTDIR"/.ci/common/platform.sh
+. .ci/common/project.sh
 
-download() {
-    url="$1"; out="$2"
-    if command -v wget >/dev/null 2>&1; then
-        wget --retry-connrefused --tries=30 "$url" -O "$out"
-    elif command -v curl >/dev/null 2>&1; then
-        curl -L --retry 30 -o "$out" "$url"
-    elif command -v fetch >/dev/null 2>&1; then
-        fetch -o "$out" "$url"
-    else
-        echo "Error: no downloader found." >&2
-        exit 1
-    fi
-}
+SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
 
-URUNTIME="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/uruntime2appimage.sh"
-# SHARUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh"
-# TMP
-SHARUN="https://github.com/crueter/Anylinux-AppImages/raw/refs/heads/patch-1/useful-tools/quick-sharun.sh"
-
-export ICON="$ROOTDIR/dist/org.Q-FRC.QDash.svg"
-export DESKTOP="$ROOTDIR/dist/org.Q-FRC.QDash.desktop"
+export ICON="$PWD/dist/org.Q-FRC.QDash.svg"
+export DESKTOP="$PWD/dist/org.Q-FRC.QDash.desktop"
 export OPTIMIZE_LAUNCH=1
 export DEPLOY_OPENGL=1
 export DEPLOY_VULKAN=0
 export ADD_HOOKS="wayland-is-broken.hook"
 
-if [ "$QT" = "ON" ]; then
-	export DEPLOY_QML=0
-	export DEPLOY_QT=0
-fi
-
-if [ -d "${BUILDDIR}/bin/Release" ]; then
-    strip -s "${BUILDDIR}/bin/Release/"*
-else
-    strip -s "${BUILDDIR}/bin/"*
-fi
-
-VERSION=$(cat "$ROOTDIR/GIT-TAG" 2>/dev/null || echo 'v0.0.4-Workflow')
+VERSION=$(cat "$PWD/GIT-TAG" 2>/dev/null || echo 'v0.0.4-Workflow')
 echo "Making \"$VERSION\" build"
 
 export OUTNAME="$PROJECT_PRETTYNAME-Linux-$VERSION-$FULL_ARCH.AppImage"
 UPINFO="gh-releases-zsync|QDash-CI|Releases|latest|*-$FULL_ARCH.AppImage.zsync"
 
 if [ "$DEVEL" = 'true' ]; then
-    case "$(uname)" in
-        FreeBSD|Darwin) sed -i '' "s|Name=${PROJECT_PRETTYNAME}|Name=${PROJECT_PRETTYNAME} Nightly|" "$DESKTOP" ;;
-        *) sed -i "s|Name=${PROJECT_PRETTYNAME}|Name=${PROJECT_PRETTYNAME} Nightly|" "$DESKTOP" ;;
-    esac
-    UPINFO="$(echo "$UPINFO" | sed 's|Releases|nightly|')"
+	sed -i "s|Name=${PROJECT_PRETTYNAME}|Name=${PROJECT_PRETTYNAME} Nightly|" "$DESKTOP"
+    UPINFO="$(echo "$UPINFO" | sed 's|Releases|Nightly|')"
 fi
 
 export UPINFO
 
 # deploy
-download "$SHARUN" "$ROOTDIR/quick-sharun"
-chmod +x "$ROOTDIR/quick-sharun"
-# env LC_ALL=C "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
-
-/bin/sh -x "$ROOTDIR/quick-sharun" "$BUILDDIR/bin/${PROJECT_REPO}"
-
-# Wayland is mankind's worst invention, perhaps only behind war
-# mkdir -p "$ROOTDIR/AppDir"
-# echo 'QT_QPA_PLATFORM=xcb' >> "$ROOTDIR/AppDir/.env"
+curl -L --retry 30 "$SHARUN" -o quick-sharun
+chmod +x quick-sharun
+./quick-sharun "$BUILDDIR/bin/${PROJECT_REPO}"
 
 # fluent is unneeded and kind of fat
-rm -rf "$ROOTDIR"/AppDir/shared/lib/qt6/qml/QtQuick/Controls/FluentWinUI3
+rm -rf AppDir/shared/lib/qt6/qml/QtQuick/Controls/FluentWinUI3
 
 # MAKE APPIMAGE WITH URUNTIME
-echo "Generating AppImage..."
-download "$URUNTIME" "$ROOTDIR/uruntime2appimage"
-chmod +x "$ROOTDIR/uruntime2appimage"
-"$ROOTDIR/uruntime2appimage"
+./quick-sharun --make-appimage
 
 if [ "$DEVEL" = 'true' ]; then
-    rm -f "$ROOTDIR"/*.AppImage.zsync
+    rm -f ./*.AppImage.zsync
 fi
 
 echo "Linux package created!"
