@@ -17,9 +17,9 @@ sed -i "s|$GH_HOST/$GH_REPO|$FJ_HOST/$FJ_REPO|g" changelog.md
 git clone https://git.crueter.xyz/scripts/fj.git
 
 fj/fj.sh -k "$FJ_TOKEN" -r "$FJ_REPO" -u "$FJ_HOST" release -t "$FORGEJO_REF" \
-	create -b changelog.md -n "$PROJECT_PRETTYNAME $FORGEJO_REF" -d > url
+	create -b changelog.md -n "$PROJECT_PRETTYNAME $FORGEJO_REF" -d || true
 
-cat url
+echo "https://$FJ_HOST/$FJ_REPO/releases/tag/$FORGEJO_REF" > url
 
 fj/fj.sh -k "$FJ_TOKEN" -r "$FJ_REPO" -u "$FJ_HOST" release -t "$FORGEJO_REF" \
-	upload -g artifacts/*
+	upload -g artifacts/* || true
