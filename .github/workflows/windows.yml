@@ -54,7 +54,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5.0.0
 
-      - uses: repolevedavaj/install-nsis@v1
+      - uses: repolevedavaj/install-nsis@v1.2.0
         with:
           nsis-version: 3.10
 
@@ -63,11 +63,6 @@ jobs:
         with:
           key: ${{ runner.os }}-${{ matrix.os.arch }}-${{ matrix.compiler.program }}
           version: ${{ inputs.cpm-cache-version }}
-
-      - name: Load payload environment
-        shell: bash
-        run: |
-          . ./.ci/fj/load-env.sh
 
       - name: Set up MSVC
         uses: ilammy/msvc-dev-cmd@v1.13.0
