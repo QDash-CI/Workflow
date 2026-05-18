@@ -54,21 +54,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5.0.0
 
-      - uses: repolevedavaj/install-nsis@v1.0.3
+      - uses: repolevedavaj/install-nsis@v1
         with:
-          nsis-version: 3.09
+          nsis-version: 3.10
 
       - name: Setup
         uses: ./.github/workflows/setup
         with:
           key: ${{ runner.os }}-${{ matrix.os.arch }}-${{ matrix.compiler.program }}
           version: ${{ inputs.cpm-cache-version }}
-
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4.3.0
-        with:
-          version: ${{ env.QT_VERSION }}
-          cache: 'true'
 
       - name: Load payload environment
         shell: bash
