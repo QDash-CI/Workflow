@@ -56,7 +56,7 @@ jobs:
 
       - uses: repolevedavaj/install-nsis@v1.2.0
         with:
-          nsis-version: 3.10
+          nsis-version: '3.10'
 
       - name: Setup
         uses: ./.github/workflows/setup
