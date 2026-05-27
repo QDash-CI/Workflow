@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -88,13 +88,14 @@ jobs:
           rm -rf QDash/.git* QDash/.ci QDash/.github
 
       - name: Upload payload environment
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7
         with:
           name: forgejo-env
           path: forgejo.env
+          archive: false
 
       - name: Upload cloned repo
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7
         with:
           name: QDash
           include-hidden-files: true
@@ -109,10 +110,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v6
 
       - name: Clone
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@v8
 
       - name: Build
         run: ./.ci/source/build.sh
@@ -121,10 +122,11 @@ jobs:
         run: ./.ci/source/package.sh
 
       - name: Upload source
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7
         with:
           name: source
-          path: source.*
+          path: source.tar.zst
+          archive: false
 
   linux:
     name: "AppImage"
@@ -164,7 +166,7 @@ jobs:
     if: ${{ always() && cancelled() && ((inputs.build-id || '') == 'master' || (inputs.build-id || '') == 'pull_request') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5.0.0
+      - uses: actions/checkout@v6
       - name: Load payload env and send status
         run: |
           export FORGEJO_REPO="${{ github.event.client_payload.repository }}"
@@ -177,7 +179,7 @@ jobs:
     if: ${{ always() && failure() && ((inputs.build-id || '') == 'master' || (inputs.build-id || '') == 'pull_request') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5.0.0
+      - uses: actions/checkout@v6
       - name: Load payload env and send status
         run: |
           export FORGEJO_REPO="${{ github.event.client_payload.repository }}"
@@ -191,7 +193,7 @@ jobs:
     if: ${{ always() && success() && ((inputs.build-id || '') == 'master' || (inputs.build-id || '') == 'pull_request') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5.0.0
+      - uses: actions/checkout@v6
       - name: Load payload env and send status
         run: |
           export FORGEJO_REPO="${{ github.event.client_payload.repository }}"

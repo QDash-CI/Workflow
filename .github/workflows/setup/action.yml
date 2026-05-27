@@ -1,4 +1,5 @@
 name: Setup
+description: Setup CPM cache, sccache, env, etc
 
 inputs:
   key:
@@ -12,12 +13,12 @@ runs:
   using: composite
   steps:
     - name: Install sccache
-      uses: Eden-CI/sccache-action@v0.0.1
+      uses: Mozilla-Actions/sccache-action@v0.0.10
       with:
         disable_annotations: true
 
     - name: Download Forgejo environment
-      uses: actions/download-artifact@v5.0.0
+      uses: actions/download-artifact@v8
       with:
         name: forgejo-env
 
@@ -27,12 +28,12 @@ runs:
         . ./.ci/fj/load-env.sh
 
     - name: Clone
-      uses: actions/download-artifact@v5.0.0
+      uses: actions/download-artifact@v8
       with:
         name: QDash
 
     - name: Set up CPM cache
-      uses: actions/cache@v4.3.0
+      uses: actions/cache@v5
       with:
         path: |
           ${{ github.workspace }}/.cache

@@ -31,18 +31,19 @@ jobs:
       GH_TOKEN: "${{ secrets.CUSTOM_GITHUB_TOKEN }}"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5.0.0
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
       - name: Download artifacts
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@v8
+        with:
+          skip-decompress: true
+          merge-multiple: true
 
       - name: Load payload environment
         shell: bash
-        run: |
-          export FORGEJO_LENV=forgejo-env/forgejo.env
-          . ./.ci/fj/load-env.sh
+        run: . ./.ci/fj/load-env.sh
 
       - name: Set environment variables
         run: |
