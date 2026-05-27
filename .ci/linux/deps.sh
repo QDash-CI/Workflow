@@ -45,10 +45,10 @@ chmod +x ./get-debloated-pkgs.sh
 echo "Installing custom Qt..."
 echo "---------------------------------------------------------------"
 
-_ver=6.9.3
+_ver=6.11.1
 _qtdir=/usr/lib/qt6
 _tdir=$(mktemp -d)
-_url=https://github.com/crueter-ci/Qt/releases/download/v$_ver/qt-archlinux-$TARGET-$_ver.tar.zst
+_url=https://github.com/QDash-CI/Qt/releases/download/v$_ver/qt-archlinux-$TARGET-$_ver.tar.zst
 
 curl -L "$_url" -o qt.tar.zst
 tar xf qt.tar.zst -C /usr
