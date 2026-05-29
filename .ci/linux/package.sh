@@ -19,10 +19,7 @@ export DEPLOY_OPENGL=1
 export DEPLOY_VULKAN=0
 export ADD_HOOKS="wayland-is-broken.hook"
 
-VERSION=$(cat "$PWD/GIT-TAG" 2>/dev/null || echo 'v0.0.4-Workflow')
-echo "Making \"$VERSION\" build"
-
-export OUTNAME="$PROJECT_PRETTYNAME-Linux-$VERSION-$FULL_ARCH.AppImage"
+export OUTNAME="$PROJECT_PRETTYNAME-Linux-$FORGEJO_REF-$FULL_ARCH.AppImage"
 UPINFO="gh-releases-zsync|QDash-CI|Releases|latest|*-$FULL_ARCH.AppImage.zsync"
 
 if [ "$DEVEL" = 'true' ]; then
@@ -48,3 +45,6 @@ if [ "$DEVEL" = 'true' ]; then
 fi
 
 echo "Linux package created!"
+
+mkdir artifacts
+mv *.AppImage* artifacts

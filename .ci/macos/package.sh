@@ -21,7 +21,9 @@ codesign --deep --force --verbose --sign - "$APP"
 # test
 otool -L "$APP"/Contents/MacOS/"${PROJECT_REPO}"
 
-mkdir -p "$ARTIFACTS_DIR"
-tar czf "$ARTIFACTS_DIR/${PROJECT_REPO}.tar.gz" "$APP"
+OUTPUT="${PROJECT_PRETTYNAME}-macOS-${FORGEJO_REF}.tar.gz"
 
-echo "MacOS package created at $ARTIFACTS_DIR/${PROJECT_REPO}.tar.gz"
+mkdir -p "$ARTIFACTS_DIR"
+tar czf "$ARTIFACTS_DIR/$OUTPUT" "$APP"
+
+echo "MacOS package created at $ARTIFACTS_DIR/$OUTPUT"
