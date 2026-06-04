@@ -55,7 +55,7 @@ tar xf qt.tar.zst -C /usr
 
 # oopsies
 rm -rf /usr/lib/qt6/qml/QtCharts /usr/lib/*Charts* /usr/lib/cmake/Qt6Qml/QmlPlugins/*charts*
-rm -rf /usr/lib/qt6/qml/Qt/labs /usr/lib/*Labs*
+rm -rf /usr/lib/qt6/qml/Qt/labs /usr/lib/*Labs* /usr/lib/cmake/*Labs*
 
 # ugh
 for lab in labs Labs folderlistmodel settings wavefront sharedimage; do
