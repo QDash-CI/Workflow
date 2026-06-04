@@ -58,6 +58,6 @@ rm -rf /usr/lib/qt6/qml/QtCharts /usr/lib/*Charts* /usr/lib/cmake/Qt6Qml/QmlPlug
 rm -rf /usr/lib/qt6/qml/Qt/labs /usr/lib/*Labs*
 
 # ugh
-for lab in labs Labs folderlistmodel; do
+for lab in labs Labs folderlistmodel settings; do
 	rm -rf /usr/lib/cmake/Qt6Qml/QmlPlugins/*${lab}*
 done
