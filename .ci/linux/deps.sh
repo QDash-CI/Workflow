@@ -55,4 +55,9 @@ tar xf qt.tar.zst -C /usr
 
 # oopsies
 rm -rf /usr/lib/qt6/qml/QtCharts /usr/lib/*Charts* /usr/lib/cmake/Qt6Qml/QmlPlugins/*charts*
-rm -rf /usr/lib/qt6/qml/Qt/labs /usr/lib/*Labs* /usr/lib/cmake/Qt6Qml/QmlPlugins/*labs* /usr/lib/cmake/Qt6Qml/QmlPlugins/*Labs*
+rm -rf /usr/lib/qt6/qml/Qt/labs /usr/lib/*Labs*
+
+# ugh
+for lab in labs Labs folderlistmodel; do
+	rm -rf /usr/lib/cmake/Qt6Qml/QmlPlugins/*${lab}*
+done
