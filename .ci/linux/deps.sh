@@ -52,3 +52,6 @@ _url=https://github.com/QDash-CI/Qt/releases/download/v$_ver/qt-archlinux-$TARGE
 
 curl -L "$_url" -o qt.tar.zst
 tar xf qt.tar.zst -C /usr
+
+# oopsies
+rm -rf /usr/lib/qt6/qml/QtCharts /usr/lib/*Charts*
